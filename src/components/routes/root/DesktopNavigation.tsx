@@ -86,7 +86,6 @@ export default function DesktopNavigation({ isSearchOpen }: DesktopNavigationPro
             <NavigationMenuContent className={DESKTOP_NAV_STYLES.menuContent(isLandingPage)}>
               <ul className={DESKTOP_NAV_STYLES.productGrid}>
                 <ProductMenuLink productName="mirascope" />
-                <ProductMenuLink productName="lilypad" />
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>

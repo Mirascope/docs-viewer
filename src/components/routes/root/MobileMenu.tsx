@@ -47,7 +47,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className={MOBILE_MENU_STYLES.sectionTitle}>Docs</div>
 
         <MobileProductLink productName="mirascope" onClick={onClose} />
-        <MobileProductLink productName="lilypad" onClick={onClose} />
 
         <hr className={MOBILE_MENU_STYLES.divider} />
 

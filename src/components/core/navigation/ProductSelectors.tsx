@@ -16,7 +16,6 @@ function buildValidDocPaths() {
 
   // Add special llms-full routes manually
   validDocPaths.add("/docs/mirascope/llms-full");
-  validDocPaths.add("/docs/lilypad/llms-full");
 }
 
 // Initialize cache when module loads
@@ -97,12 +96,6 @@ export function DocsProductSelector() {
         <ProductTitle product="mirascope" />
       ) : (
         <ProductLink product="mirascope" />
-      )}
-
-      {currentProduct === "lilypad" ? (
-        <ProductTitle product="lilypad" />
-      ) : (
-        <ProductLink product="lilypad" />
       )}
     </div>
   );
