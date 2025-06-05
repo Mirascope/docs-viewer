@@ -3,7 +3,6 @@ import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { resolve } from "node:path";
-import { optimizedImageMiddleware } from "./scripts/optimized-image-middleware";
 import { contentPreprocessPlugin } from "./scripts/preprocess-content";
 import { json404Middleware } from "./scripts/json-404-middleware";
 import { pagefindDevPlugin } from "./scripts/pagefind-dev-plugin";
@@ -15,7 +14,6 @@ export default defineConfig({
     viteReact(),
     tailwindcss(),
     contentPreprocessPlugin(),
-    optimizedImageMiddleware(),
     json404Middleware(),
     pagefindDevPlugin(),
   ],
@@ -38,7 +36,7 @@ export default defineConfig({
       strict: false,
     },
   },
-  
+
   // Keeping the default build configuration
   build: {
     assetsInlineLimit: 4096, // Default inline limit
