@@ -69,18 +69,9 @@ export const Route = createRootRoute({
 
         <ThemeProvider>
           <ProductProvider product={getProductFromPath(path)}>
-            <div
-              className="flex min-h-screen flex-col px-2"
-              style={
-                {
-                  "--header-height": path.startsWith("/docs/")
-                    ? "var(--header-height-with-selector)"
-                    : "var(--header-height-base)",
-                } as React.CSSProperties
-              }
-            >
+            <div className="flex min-h-screen flex-col px-2">
               {/* Header is fixed, so it's outside the content flow */}
-              <Header showProductSelector={path.startsWith("/docs/")} />
+              <Header />
 
               {/* Content container with padding to account for fixed header */}
               <div

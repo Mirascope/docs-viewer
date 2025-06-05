@@ -1,27 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
-import {
-  ProductLogo,
-  GitHubRepoButton,
-  DocsProductSelector,
-  useIsLandingPage,
-} from "@/src/components/core";
+import { ProductLogo, GitHubRepoButton, useIsLandingPage } from "@/src/components/core";
 import ThemeSwitcher from "@/src/components/routes/root/ThemeSwitcher";
-import DesktopNavigation from "@/src/components/routes/root/DesktopNavigation";
-import MobileMenu from "@/src/components/routes/root/MobileMenu";
 import ResponsiveSearchWrapper from "@/src/components/routes/root/ResponsiveSearchWrapper";
 import { HEADER_STYLES } from "./styles";
 import { cn } from "@/src/lib/utils";
 
-interface HeaderProps {
-  /**
-   * Whether to show the product selector for docs pages
-   */
-  showProductSelector?: boolean;
-}
-
-export default function Header({ showProductSelector = false }: HeaderProps) {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -58,8 +44,6 @@ export default function Header({ showProductSelector = false }: HeaderProps) {
           />
         </Link>
 
-        <DesktopNavigation isSearchOpen={isSearchOpen} />
-
         {/* Adding a flex-grow spacer to push elements to edges */}
         <div className="flex-grow"></div>
 
@@ -90,16 +74,6 @@ export default function Header({ showProductSelector = false }: HeaderProps) {
           </button>
         </div>
       </nav>
-
-      {/* Product selectors for docs and dev pages */}
-      {showProductSelector && (
-        <div className={HEADER_STYLES.productSelector}>
-          <DocsProductSelector />
-        </div>
-      )}
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </header>
   );
 }
