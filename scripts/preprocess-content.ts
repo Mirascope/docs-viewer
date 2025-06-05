@@ -3,10 +3,28 @@ import path from "path";
 import { ContentPreprocessor } from "@/src/lib/content/preprocess";
 import { DocRegistry } from "@/src/lib/content";
 import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
-import type { LLMContent } from "@/src/lib/content/llm-content";
+import { LLMContent } from "@/src/lib/content/llm-content";
+import { include } from "@/src/lib/content/llm-includes";
 import { SITE_URL, getAllRoutes } from "@/src/lib/router-utils";
 import type { BlogMeta } from "@/src/lib/content";
-import llmMeta from "@/content/llms/_llms-meta";
+import { MIRASCOPE } from "@/src/lib/constants/site";
+
+/**
+ * Generate LLM content dynamically from the doc registry
+ */
+function generateLLMContent(registry: DocRegistry): LLMContent[] {
+  const mirascopeChildren = include.flatTree("mirascope", registry);
+
+  const mirascopeContent = LLMContent.fromChildren({
+    slug: "mirascope",
+    title: "Mirascope",
+    description: MIRASCOPE.tagline,
+    route: "/docs/mirascope/llms-full",
+    children: mirascopeChildren,
+  });
+
+  return [mirascopeContent];
+}
 
 /**
  * Main processing function that generates static JSON files for all MDX content,
@@ -24,6 +42,7 @@ export async function preprocessContent(verbose = true): Promise<void> {
     await preprocessor.processAllContent();
 
     if (verbose) console.log("Processing LLM documents...");
+    const llmMeta = generateLLMContent(registry);
     await writeLLMDocuments(llmMeta, verbose);
 
     await generateSitemap(preprocessor.getMetadataByType().blog, llmMeta);

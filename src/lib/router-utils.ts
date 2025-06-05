@@ -4,8 +4,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { type BlogMeta, DocRegistry } from "@/src/lib/content";
 import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
-import llmMeta from "@/content/llms/_llms-meta";
-import type { LLMContent } from "@/src/lib/content/llm-content";
 
 // Base URL for the site
 export const SITE_URL = "https://mirascope.com";
@@ -162,13 +160,8 @@ export function getDocsRoutes(): string[] {
  * Get LLM document routes
  */
 export function getLLMDocRoutes(): string[] {
-  function getRoute(doc: LLMContent): string {
-    if (!doc.route) {
-      throw new Error(`LLM document ${doc.slug} does not have a route defined`);
-    }
-    return doc.route;
-  }
-  return llmMeta.map(getRoute).sort();
+  // Hardcoded for now since we only have one LLM document
+  return ["/docs/mirascope/llms-full"];
 }
 
 /**
