@@ -11,41 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as PrivacyImport } from './routes/privacy'
 import { Route as LlmsFullImport } from './routes/llms-full'
-import { Route as DevImport } from './routes/dev'
 import { Route as R404Import } from './routes/404'
 import { Route as CatchallImport } from './routes/$catchall'
 import { Route as IndexImport } from './routes/index'
-import { Route as TermsIndexImport } from './routes/terms/index'
 import { Route as DocsIndexImport } from './routes/docs.index'
-import { Route as DevIndexImport } from './routes/dev/index'
-import { Route as TermsUseImport } from './routes/terms/use'
-import { Route as TermsServiceImport } from './routes/terms/service'
 import { Route as DocsSplatImport } from './routes/docs.$'
-import { Route as DevSocialCardImport } from './routes/dev/social-card'
-import { Route as DevLayoutTestImport } from './routes/dev/layout-test'
-import { Route as DevAuditMetadataImport } from './routes/dev/audit-metadata'
-import { Route as DevSlugImport } from './routes/dev.$slug'
 import { Route as DocsProductLlmsFullImport } from './routes/docs.$product.llms-full'
 
 // Create/Update Routes
 
-const PrivacyRoute = PrivacyImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const LlmsFullRoute = LlmsFullImport.update({
   id: '/llms-full',
   path: '/llms-full',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DevRoute = DevImport.update({
-  id: '/dev',
-  path: '/dev',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,33 +45,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const TermsIndexRoute = TermsIndexImport.update({
-  id: '/terms/',
-  path: '/terms/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const DocsIndexRoute = DocsIndexImport.update({
   id: '/docs/',
   path: '/docs/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DevIndexRoute = DevIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DevRoute,
-} as any)
-
-const TermsUseRoute = TermsUseImport.update({
-  id: '/terms/use',
-  path: '/terms/use',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const TermsServiceRoute = TermsServiceImport.update({
-  id: '/terms/service',
-  path: '/terms/service',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -101,30 +55,6 @@ const DocsSplatRoute = DocsSplatImport.update({
   id: '/docs/$',
   path: '/docs/$',
   getParentRoute: () => rootRoute,
-} as any)
-
-const DevSocialCardRoute = DevSocialCardImport.update({
-  id: '/social-card',
-  path: '/social-card',
-  getParentRoute: () => DevRoute,
-} as any)
-
-const DevLayoutTestRoute = DevLayoutTestImport.update({
-  id: '/layout-test',
-  path: '/layout-test',
-  getParentRoute: () => DevRoute,
-} as any)
-
-const DevAuditMetadataRoute = DevAuditMetadataImport.update({
-  id: '/audit-metadata',
-  path: '/audit-metadata',
-  getParentRoute: () => DevRoute,
-} as any)
-
-const DevSlugRoute = DevSlugImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => DevRoute,
 } as any)
 
 const DocsProductLlmsFullRoute = DocsProductLlmsFullImport.update({
@@ -158,54 +88,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof R404Import
       parentRoute: typeof rootRoute
     }
-    '/dev': {
-      id: '/dev'
-      path: '/dev'
-      fullPath: '/dev'
-      preLoaderRoute: typeof DevImport
-      parentRoute: typeof rootRoute
-    }
     '/llms-full': {
       id: '/llms-full'
       path: '/llms-full'
       fullPath: '/llms-full'
       preLoaderRoute: typeof LlmsFullImport
       parentRoute: typeof rootRoute
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyImport
-      parentRoute: typeof rootRoute
-    }
-    '/dev/$slug': {
-      id: '/dev/$slug'
-      path: '/$slug'
-      fullPath: '/dev/$slug'
-      preLoaderRoute: typeof DevSlugImport
-      parentRoute: typeof DevImport
-    }
-    '/dev/audit-metadata': {
-      id: '/dev/audit-metadata'
-      path: '/audit-metadata'
-      fullPath: '/dev/audit-metadata'
-      preLoaderRoute: typeof DevAuditMetadataImport
-      parentRoute: typeof DevImport
-    }
-    '/dev/layout-test': {
-      id: '/dev/layout-test'
-      path: '/layout-test'
-      fullPath: '/dev/layout-test'
-      preLoaderRoute: typeof DevLayoutTestImport
-      parentRoute: typeof DevImport
-    }
-    '/dev/social-card': {
-      id: '/dev/social-card'
-      path: '/social-card'
-      fullPath: '/dev/social-card'
-      preLoaderRoute: typeof DevSocialCardImport
-      parentRoute: typeof DevImport
     }
     '/docs/$': {
       id: '/docs/$'
@@ -214,39 +102,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsSplatImport
       parentRoute: typeof rootRoute
     }
-    '/terms/service': {
-      id: '/terms/service'
-      path: '/terms/service'
-      fullPath: '/terms/service'
-      preLoaderRoute: typeof TermsServiceImport
-      parentRoute: typeof rootRoute
-    }
-    '/terms/use': {
-      id: '/terms/use'
-      path: '/terms/use'
-      fullPath: '/terms/use'
-      preLoaderRoute: typeof TermsUseImport
-      parentRoute: typeof rootRoute
-    }
-    '/dev/': {
-      id: '/dev/'
-      path: '/'
-      fullPath: '/dev/'
-      preLoaderRoute: typeof DevIndexImport
-      parentRoute: typeof DevImport
-    }
     '/docs/': {
       id: '/docs/'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/terms/': {
-      id: '/terms/'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsIndexImport
       parentRoute: typeof rootRoute
     }
     '/docs/$product/llms-full': {
@@ -261,41 +121,13 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface DevRouteChildren {
-  DevSlugRoute: typeof DevSlugRoute
-  DevAuditMetadataRoute: typeof DevAuditMetadataRoute
-  DevLayoutTestRoute: typeof DevLayoutTestRoute
-  DevSocialCardRoute: typeof DevSocialCardRoute
-  DevIndexRoute: typeof DevIndexRoute
-}
-
-const DevRouteChildren: DevRouteChildren = {
-  DevSlugRoute: DevSlugRoute,
-  DevAuditMetadataRoute: DevAuditMetadataRoute,
-  DevLayoutTestRoute: DevLayoutTestRoute,
-  DevSocialCardRoute: DevSocialCardRoute,
-  DevIndexRoute: DevIndexRoute,
-}
-
-const DevRouteWithChildren = DevRoute._addFileChildren(DevRouteChildren)
-
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$catchall': typeof CatchallRoute
   '/404': typeof R404Route
-  '/dev': typeof DevRouteWithChildren
   '/llms-full': typeof LlmsFullRoute
-  '/privacy': typeof PrivacyRoute
-  '/dev/$slug': typeof DevSlugRoute
-  '/dev/audit-metadata': typeof DevAuditMetadataRoute
-  '/dev/layout-test': typeof DevLayoutTestRoute
-  '/dev/social-card': typeof DevSocialCardRoute
   '/docs/$': typeof DocsSplatRoute
-  '/terms/service': typeof TermsServiceRoute
-  '/terms/use': typeof TermsUseRoute
-  '/dev/': typeof DevIndexRoute
   '/docs': typeof DocsIndexRoute
-  '/terms': typeof TermsIndexRoute
   '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
 }
 
@@ -304,17 +136,8 @@ export interface FileRoutesByTo {
   '/$catchall': typeof CatchallRoute
   '/404': typeof R404Route
   '/llms-full': typeof LlmsFullRoute
-  '/privacy': typeof PrivacyRoute
-  '/dev/$slug': typeof DevSlugRoute
-  '/dev/audit-metadata': typeof DevAuditMetadataRoute
-  '/dev/layout-test': typeof DevLayoutTestRoute
-  '/dev/social-card': typeof DevSocialCardRoute
   '/docs/$': typeof DocsSplatRoute
-  '/terms/service': typeof TermsServiceRoute
-  '/terms/use': typeof TermsUseRoute
-  '/dev': typeof DevIndexRoute
   '/docs': typeof DocsIndexRoute
-  '/terms': typeof TermsIndexRoute
   '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
 }
 
@@ -323,19 +146,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$catchall': typeof CatchallRoute
   '/404': typeof R404Route
-  '/dev': typeof DevRouteWithChildren
   '/llms-full': typeof LlmsFullRoute
-  '/privacy': typeof PrivacyRoute
-  '/dev/$slug': typeof DevSlugRoute
-  '/dev/audit-metadata': typeof DevAuditMetadataRoute
-  '/dev/layout-test': typeof DevLayoutTestRoute
-  '/dev/social-card': typeof DevSocialCardRoute
   '/docs/$': typeof DocsSplatRoute
-  '/terms/service': typeof TermsServiceRoute
-  '/terms/use': typeof TermsUseRoute
-  '/dev/': typeof DevIndexRoute
   '/docs/': typeof DocsIndexRoute
-  '/terms/': typeof TermsIndexRoute
   '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
 }
 
@@ -345,19 +158,9 @@ export interface FileRouteTypes {
     | '/'
     | '/$catchall'
     | '/404'
-    | '/dev'
     | '/llms-full'
-    | '/privacy'
-    | '/dev/$slug'
-    | '/dev/audit-metadata'
-    | '/dev/layout-test'
-    | '/dev/social-card'
     | '/docs/$'
-    | '/terms/service'
-    | '/terms/use'
-    | '/dev/'
     | '/docs'
-    | '/terms'
     | '/docs/$product/llms-full'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -365,36 +168,17 @@ export interface FileRouteTypes {
     | '/$catchall'
     | '/404'
     | '/llms-full'
-    | '/privacy'
-    | '/dev/$slug'
-    | '/dev/audit-metadata'
-    | '/dev/layout-test'
-    | '/dev/social-card'
     | '/docs/$'
-    | '/terms/service'
-    | '/terms/use'
-    | '/dev'
     | '/docs'
-    | '/terms'
     | '/docs/$product/llms-full'
   id:
     | '__root__'
     | '/'
     | '/$catchall'
     | '/404'
-    | '/dev'
     | '/llms-full'
-    | '/privacy'
-    | '/dev/$slug'
-    | '/dev/audit-metadata'
-    | '/dev/layout-test'
-    | '/dev/social-card'
     | '/docs/$'
-    | '/terms/service'
-    | '/terms/use'
-    | '/dev/'
     | '/docs/'
-    | '/terms/'
     | '/docs/$product/llms-full'
   fileRoutesById: FileRoutesById
 }
@@ -403,14 +187,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CatchallRoute: typeof CatchallRoute
   R404Route: typeof R404Route
-  DevRoute: typeof DevRouteWithChildren
   LlmsFullRoute: typeof LlmsFullRoute
-  PrivacyRoute: typeof PrivacyRoute
   DocsSplatRoute: typeof DocsSplatRoute
-  TermsServiceRoute: typeof TermsServiceRoute
-  TermsUseRoute: typeof TermsUseRoute
   DocsIndexRoute: typeof DocsIndexRoute
-  TermsIndexRoute: typeof TermsIndexRoute
   DocsProductLlmsFullRoute: typeof DocsProductLlmsFullRoute
 }
 
@@ -418,14 +197,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CatchallRoute: CatchallRoute,
   R404Route: R404Route,
-  DevRoute: DevRouteWithChildren,
   LlmsFullRoute: LlmsFullRoute,
-  PrivacyRoute: PrivacyRoute,
   DocsSplatRoute: DocsSplatRoute,
-  TermsServiceRoute: TermsServiceRoute,
-  TermsUseRoute: TermsUseRoute,
   DocsIndexRoute: DocsIndexRoute,
-  TermsIndexRoute: TermsIndexRoute,
   DocsProductLlmsFullRoute: DocsProductLlmsFullRoute,
 }
 
@@ -442,14 +216,9 @@ export const routeTree = rootRoute
         "/",
         "/$catchall",
         "/404",
-        "/dev",
         "/llms-full",
-        "/privacy",
         "/docs/$",
-        "/terms/service",
-        "/terms/use",
         "/docs/",
-        "/terms/",
         "/docs/$product/llms-full"
       ]
     },
@@ -462,56 +231,14 @@ export const routeTree = rootRoute
     "/404": {
       "filePath": "404.tsx"
     },
-    "/dev": {
-      "filePath": "dev.tsx",
-      "children": [
-        "/dev/$slug",
-        "/dev/audit-metadata",
-        "/dev/layout-test",
-        "/dev/social-card",
-        "/dev/"
-      ]
-    },
     "/llms-full": {
       "filePath": "llms-full.tsx"
-    },
-    "/privacy": {
-      "filePath": "privacy.tsx"
-    },
-    "/dev/$slug": {
-      "filePath": "dev.$slug.tsx",
-      "parent": "/dev"
-    },
-    "/dev/audit-metadata": {
-      "filePath": "dev/audit-metadata.tsx",
-      "parent": "/dev"
-    },
-    "/dev/layout-test": {
-      "filePath": "dev/layout-test.tsx",
-      "parent": "/dev"
-    },
-    "/dev/social-card": {
-      "filePath": "dev/social-card.tsx",
-      "parent": "/dev"
     },
     "/docs/$": {
       "filePath": "docs.$.tsx"
     },
-    "/terms/service": {
-      "filePath": "terms/service.tsx"
-    },
-    "/terms/use": {
-      "filePath": "terms/use.tsx"
-    },
-    "/dev/": {
-      "filePath": "dev/index.tsx",
-      "parent": "/dev"
-    },
     "/docs/": {
       "filePath": "docs.index.tsx"
-    },
-    "/terms/": {
-      "filePath": "terms/index.tsx"
     },
     "/docs/$product/llms-full": {
       "filePath": "docs.$product.llms-full.tsx"

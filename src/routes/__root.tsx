@@ -1,9 +1,8 @@
 import { Outlet, createRootRoute, useRouterState, redirect } from "@tanstack/react-router";
 import { processRedirects } from "../lib/redirects";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { getProductFromPath } from "../lib/utils";
 
-import { Header, Footer, DevToolsButton } from "@/src/components/routes/root";
+import { Header, Footer } from "@/src/components/routes/root";
 import {
   FunModeProvider,
   ThemeProvider,
@@ -91,8 +90,6 @@ export const Route = createRootRoute({
           </ProductProvider>
 
           {/* Dev tools - only visible in development */}
-          <TanStackRouterDevtools />
-          <DevToolsButton className="fixed bottom-10 left-2 z-50" />
         </ThemeProvider>
       </>
     );
