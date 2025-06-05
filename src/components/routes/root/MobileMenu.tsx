@@ -51,10 +51,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         <hr className={MOBILE_MENU_STYLES.divider} />
 
-        <Link to="/blog" className={NAV_LINK_STYLES.mobile} onClick={onClose}>
-          Blog
-        </Link>
-
         <Link to="/pricing" className={NAV_LINK_STYLES.mobile} onClick={onClose}>
           Pricing
         </Link>

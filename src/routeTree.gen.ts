@@ -21,7 +21,6 @@ import { Route as IndexImport } from './routes/index'
 import { Route as TermsIndexImport } from './routes/terms/index'
 import { Route as DocsIndexImport } from './routes/docs.index'
 import { Route as DevIndexImport } from './routes/dev/index'
-import { Route as BlogIndexImport } from './routes/blog.index'
 import { Route as TermsUseImport } from './routes/terms/use'
 import { Route as TermsServiceImport } from './routes/terms/service'
 import { Route as DocsSplatImport } from './routes/docs.$'
@@ -29,7 +28,6 @@ import { Route as DevSocialCardImport } from './routes/dev/social-card'
 import { Route as DevLayoutTestImport } from './routes/dev/layout-test'
 import { Route as DevAuditMetadataImport } from './routes/dev/audit-metadata'
 import { Route as DevSlugImport } from './routes/dev.$slug'
-import { Route as BlogSlugImport } from './routes/blog.$slug'
 import { Route as DocsProductLlmsFullImport } from './routes/docs.$product.llms-full'
 
 // Create/Update Routes
@@ -94,12 +92,6 @@ const DevIndexRoute = DevIndexImport.update({
   getParentRoute: () => DevRoute,
 } as any)
 
-const BlogIndexRoute = BlogIndexImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const TermsUseRoute = TermsUseImport.update({
   id: '/terms/use',
   path: '/terms/use',
@@ -140,12 +132,6 @@ const DevSlugRoute = DevSlugImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => DevRoute,
-} as any)
-
-const BlogSlugRoute = BlogSlugImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRoute,
 } as any)
 
 const DocsProductLlmsFullRoute = DocsProductLlmsFullImport.update({
@@ -207,13 +193,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyImport
       parentRoute: typeof rootRoute
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugImport
-      parentRoute: typeof rootRoute
-    }
     '/dev/$slug': {
       id: '/dev/$slug'
       path: '/$slug'
@@ -261,13 +240,6 @@ declare module '@tanstack/react-router' {
       path: '/terms/use'
       fullPath: '/terms/use'
       preLoaderRoute: typeof TermsUseImport
-      parentRoute: typeof rootRoute
-    }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogIndexImport
       parentRoute: typeof rootRoute
     }
     '/dev/': {
@@ -329,7 +301,6 @@ export interface FileRoutesByFullPath {
   '/llms-full': typeof LlmsFullRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
   '/dev/layout-test': typeof DevLayoutTestRoute
@@ -337,7 +308,6 @@ export interface FileRoutesByFullPath {
   '/docs/$': typeof DocsSplatRoute
   '/terms/service': typeof TermsServiceRoute
   '/terms/use': typeof TermsUseRoute
-  '/blog': typeof BlogIndexRoute
   '/dev/': typeof DevIndexRoute
   '/docs': typeof DocsIndexRoute
   '/terms': typeof TermsIndexRoute
@@ -351,7 +321,6 @@ export interface FileRoutesByTo {
   '/llms-full': typeof LlmsFullRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
   '/dev/layout-test': typeof DevLayoutTestRoute
@@ -359,7 +328,6 @@ export interface FileRoutesByTo {
   '/docs/$': typeof DocsSplatRoute
   '/terms/service': typeof TermsServiceRoute
   '/terms/use': typeof TermsUseRoute
-  '/blog': typeof BlogIndexRoute
   '/dev': typeof DevIndexRoute
   '/docs': typeof DocsIndexRoute
   '/terms': typeof TermsIndexRoute
@@ -375,7 +343,6 @@ export interface FileRoutesById {
   '/llms-full': typeof LlmsFullRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
   '/dev/layout-test': typeof DevLayoutTestRoute
@@ -383,7 +350,6 @@ export interface FileRoutesById {
   '/docs/$': typeof DocsSplatRoute
   '/terms/service': typeof TermsServiceRoute
   '/terms/use': typeof TermsUseRoute
-  '/blog/': typeof BlogIndexRoute
   '/dev/': typeof DevIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/terms/': typeof TermsIndexRoute
@@ -400,7 +366,6 @@ export interface FileRouteTypes {
     | '/llms-full'
     | '/pricing'
     | '/privacy'
-    | '/blog/$slug'
     | '/dev/$slug'
     | '/dev/audit-metadata'
     | '/dev/layout-test'
@@ -408,7 +373,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/terms/service'
     | '/terms/use'
-    | '/blog'
     | '/dev/'
     | '/docs'
     | '/terms'
@@ -421,7 +385,6 @@ export interface FileRouteTypes {
     | '/llms-full'
     | '/pricing'
     | '/privacy'
-    | '/blog/$slug'
     | '/dev/$slug'
     | '/dev/audit-metadata'
     | '/dev/layout-test'
@@ -429,7 +392,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/terms/service'
     | '/terms/use'
-    | '/blog'
     | '/dev'
     | '/docs'
     | '/terms'
@@ -443,7 +405,6 @@ export interface FileRouteTypes {
     | '/llms-full'
     | '/pricing'
     | '/privacy'
-    | '/blog/$slug'
     | '/dev/$slug'
     | '/dev/audit-metadata'
     | '/dev/layout-test'
@@ -451,7 +412,6 @@ export interface FileRouteTypes {
     | '/docs/$'
     | '/terms/service'
     | '/terms/use'
-    | '/blog/'
     | '/dev/'
     | '/docs/'
     | '/terms/'
@@ -467,11 +427,9 @@ export interface RootRouteChildren {
   LlmsFullRoute: typeof LlmsFullRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
-  BlogSlugRoute: typeof BlogSlugRoute
   DocsSplatRoute: typeof DocsSplatRoute
   TermsServiceRoute: typeof TermsServiceRoute
   TermsUseRoute: typeof TermsUseRoute
-  BlogIndexRoute: typeof BlogIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
   TermsIndexRoute: typeof TermsIndexRoute
   DocsProductLlmsFullRoute: typeof DocsProductLlmsFullRoute
@@ -485,11 +443,9 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsFullRoute: LlmsFullRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
-  BlogSlugRoute: BlogSlugRoute,
   DocsSplatRoute: DocsSplatRoute,
   TermsServiceRoute: TermsServiceRoute,
   TermsUseRoute: TermsUseRoute,
-  BlogIndexRoute: BlogIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
   TermsIndexRoute: TermsIndexRoute,
   DocsProductLlmsFullRoute: DocsProductLlmsFullRoute,
@@ -512,11 +468,9 @@ export const routeTree = rootRoute
         "/llms-full",
         "/pricing",
         "/privacy",
-        "/blog/$slug",
         "/docs/$",
         "/terms/service",
         "/terms/use",
-        "/blog/",
         "/docs/",
         "/terms/",
         "/docs/$product/llms-full"
@@ -550,9 +504,6 @@ export const routeTree = rootRoute
     "/privacy": {
       "filePath": "privacy.tsx"
     },
-    "/blog/$slug": {
-      "filePath": "blog.$slug.tsx"
-    },
     "/dev/$slug": {
       "filePath": "dev.$slug.tsx",
       "parent": "/dev"
@@ -577,9 +528,6 @@ export const routeTree = rootRoute
     },
     "/terms/use": {
       "filePath": "terms/use.tsx"
-    },
-    "/blog/": {
-      "filePath": "blog.index.tsx"
     },
     "/dev/": {
       "filePath": "dev/index.tsx",

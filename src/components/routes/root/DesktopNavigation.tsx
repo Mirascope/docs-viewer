@@ -92,7 +92,6 @@ export default function DesktopNavigation({ isSearchOpen }: DesktopNavigationPro
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <NavLink href="/blog">Blog</NavLink>
       <NavLink href="/pricing">Pricing</NavLink>
     </div>
   );
