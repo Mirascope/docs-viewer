@@ -6,7 +6,6 @@ import { LLMContent } from "@/src/lib/content/llm-content";
 import { loadDocRegistry } from "@/src/lib/content";
 import DocsSidebar from "@/src/components/routes/docs/DocsSidebar";
 import type { ProductName } from "@/src/lib/content/spec";
-import { ButtonLink } from "@/mirascope-ui/ui/button-link";
 
 /**
  * Loader for product-specific LLM document viewer routes
@@ -84,11 +83,6 @@ function ProductLLMDocViewerPage() {
       content={content}
       txtPath={txtPath}
       leftSidebar={<DocsSidebar product={product} registry={registry} />}
-      rightSidebarExtra={
-        <ButtonLink variant="outline" href="/llms-full">
-          Cross-Product LLM Docs
-        </ButtonLink>
-      }
     />
   );
 }
