@@ -169,9 +169,7 @@ export function contentPreprocessPlugin(options = { verbose: true, contentDir: u
   const baseContentDir = contentDir || path.join(process.cwd(), "content");
 
   // Get all content directories (docs includes LLM document templates)
-  const contentDirs = ["blog", "docs", "policy", "dev"].map((type) =>
-    path.join(baseContentDir, type)
-  );
+  const contentDirs = ["docs"].map((type) => path.join(baseContentDir, type));
 
   return {
     name: "content-preprocess-plugin",
