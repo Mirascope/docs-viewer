@@ -7,12 +7,7 @@ export const mirascopeContent = LLMContent.fromChildren({
   title: "Mirascope",
   description: MIRASCOPE.tagline,
   route: "/docs/mirascope/llms-full",
-  children: [
-    // Getting Started
-    include.file("mirascope/index.mdx"),
-    // Learning Mirascope
-    ...include.directory("mirascope/learn"),
-  ],
+  children: include.directory("mirascope/"),
 });
 
 export default mirascopeContent;

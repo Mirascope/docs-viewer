@@ -8,70 +8,19 @@ const docsSection: SectionSpec = {
   children: [
     {
       slug: "index",
-      label: "Welcome",
+      label: "Mirascope V2",
     },
     {
-      slug: "learn",
-      label: "Learn",
-      weight: 2,
-      children: [
-        {
-          slug: "index",
-          label: "Overview",
-        },
-        {
-          slug: "prompts",
-          label: "Prompts",
-        },
-        {
-          slug: "calls",
-          label: "Calls",
-        },
-        {
-          slug: "streams",
-          label: "Streams",
-        },
-        {
-          slug: "chaining",
-          label: "Chaining",
-        },
-        {
-          slug: "response_models",
-          label: "Response Models",
-        },
-        {
-          slug: "json_mode",
-          label: "JSON Mode",
-        },
-        {
-          slug: "output_parsers",
-          label: "Output Parsers",
-        },
-        {
-          slug: "tools",
-          label: "Tools",
-        },
-        {
-          slug: "agents",
-          label: "Agents",
-        },
-        {
-          slug: "evals",
-          label: "Evals",
-        },
-        {
-          slug: "async",
-          label: "Async",
-        },
-        {
-          slug: "retries",
-          label: "Retries",
-        },
-        {
-          slug: "local_models",
-          label: "Local Models",
-        },
-      ],
+      slug: "calls",
+      label: "Calls",
+    },
+    {
+      slug: "streams",
+      label: "Streams",
+    },
+    {
+      slug: "async",
+      label: "Async",
     },
   ],
 };
