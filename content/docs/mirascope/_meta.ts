@@ -1,5 +1,4 @@
 import type { ProductSpec, SectionSpec } from "@/src/lib/content/spec";
-import guides from "./guides/_meta";
 import api from "./api/_meta";
 
 const docsSection: SectionSpec = {
@@ -10,28 +9,6 @@ const docsSection: SectionSpec = {
     {
       slug: "index",
       label: "Welcome",
-    },
-    {
-      slug: "getting-started",
-      label: "Getting Started",
-      children: [
-        {
-          slug: "why",
-          label: "Why Mirascope?",
-        },
-        {
-          slug: "help",
-          label: "Help",
-        },
-        {
-          slug: "contributing",
-          label: "Contributing",
-        },
-        {
-          slug: "migration",
-          label: "0.x Migration Guide",
-        },
-      ],
     },
     {
       slug: "learn",
@@ -96,44 +73,6 @@ const docsSection: SectionSpec = {
         },
       ],
     },
-    {
-      slug: "learn/provider-specific",
-      label: "Provider-Specific Features",
-      children: [
-        {
-          slug: "openai",
-          label: "OpenAI",
-        },
-        {
-          slug: "anthropic",
-          label: "Anthropic",
-        },
-      ],
-    },
-    {
-      slug: "learn/extensions",
-      label: "Extensions",
-      children: [
-        {
-          slug: "middleware",
-          label: "Middleware",
-        },
-        {
-          slug: "custom_provider",
-          label: "Custom LLM Provider",
-        },
-      ],
-    },
-    {
-      slug: "learn/mcp",
-      label: "MCP - Model Context Protocol",
-      children: [
-        {
-          slug: "client",
-          label: "Client",
-        },
-      ],
-    },
   ],
 };
 
@@ -142,6 +81,6 @@ const docsSection: SectionSpec = {
  */
 const mirascopeSpec: ProductSpec = {
   product: "mirascope",
-  sections: [docsSection, guides, api],
+  sections: [docsSection, api],
 };
 export default mirascopeSpec;

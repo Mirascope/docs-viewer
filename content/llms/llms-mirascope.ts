@@ -10,7 +10,6 @@ export const mirascopeContent = LLMContent.fromChildren({
   children: [
     // Getting Started
     include.file("mirascope/index.mdx"),
-    include.file("mirascope/guides/getting-started/quickstart.mdx"),
     // Learning Mirascope
     ...include.directory("mirascope/learn"),
   ],
