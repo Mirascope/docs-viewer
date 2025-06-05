@@ -4,12 +4,7 @@
  * This script will enumerate all routes detected by the router utility
  * and display them in different categories
  */
-import {
-  getStaticRoutes,
-  getBlogRoutes,
-  getDocsRoutes,
-  getAllRoutes,
-} from "../src/lib/router-utils";
+import { getStaticRoutes, getDocsRoutes, getAllRoutes } from "../src/lib/router-utils";
 
 // ANSI color codes for better output
 const RESET = "\x1b[0m";
@@ -49,11 +44,6 @@ async function main() {
     printHeader("Static Routes (extracted from TanStack Router)", GREEN);
     const staticRoutes = getStaticRoutes();
     printRoutes(staticRoutes, GREEN);
-
-    // Test blog routes extraction
-    printHeader("Blog Routes (from posts list)", YELLOW);
-    const blogRoutes = await getBlogRoutes();
-    printRoutes(blogRoutes, YELLOW);
 
     // Test docs routes extraction
     printHeader("Docs Routes (from _meta.ts)", MAGENTA);

@@ -15,9 +15,8 @@ import { Route as LlmsFullImport } from './routes/llms-full'
 import { Route as R404Import } from './routes/404'
 import { Route as CatchallImport } from './routes/$catchall'
 import { Route as IndexImport } from './routes/index'
-import { Route as DocsIndexImport } from './routes/docs.index'
+import { Route as DocsLlmsFullImport } from './routes/docs.llms-full'
 import { Route as DocsSplatImport } from './routes/docs.$'
-import { Route as DocsProductLlmsFullImport } from './routes/docs.$product.llms-full'
 
 // Create/Update Routes
 
@@ -45,21 +44,15 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DocsIndexRoute = DocsIndexImport.update({
-  id: '/docs/',
-  path: '/docs/',
+const DocsLlmsFullRoute = DocsLlmsFullImport.update({
+  id: '/docs/llms-full',
+  path: '/docs/llms-full',
   getParentRoute: () => rootRoute,
 } as any)
 
 const DocsSplatRoute = DocsSplatImport.update({
   id: '/docs/$',
   path: '/docs/$',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DocsProductLlmsFullRoute = DocsProductLlmsFullImport.update({
-  id: '/docs/$product/llms-full',
-  path: '/docs/$product/llms-full',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,18 +95,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsSplatImport
       parentRoute: typeof rootRoute
     }
-    '/docs/': {
-      id: '/docs/'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/docs/$product/llms-full': {
-      id: '/docs/$product/llms-full'
-      path: '/docs/$product/llms-full'
-      fullPath: '/docs/$product/llms-full'
-      preLoaderRoute: typeof DocsProductLlmsFullImport
+    '/docs/llms-full': {
+      id: '/docs/llms-full'
+      path: '/docs/llms-full'
+      fullPath: '/docs/llms-full'
+      preLoaderRoute: typeof DocsLlmsFullImport
       parentRoute: typeof rootRoute
     }
   }
@@ -127,8 +113,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/llms-full': typeof LlmsFullRoute
   '/docs/$': typeof DocsSplatRoute
-  '/docs': typeof DocsIndexRoute
-  '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
+  '/docs/llms-full': typeof DocsLlmsFullRoute
 }
 
 export interface FileRoutesByTo {
@@ -137,8 +122,7 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/llms-full': typeof LlmsFullRoute
   '/docs/$': typeof DocsSplatRoute
-  '/docs': typeof DocsIndexRoute
-  '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
+  '/docs/llms-full': typeof DocsLlmsFullRoute
 }
 
 export interface FileRoutesById {
@@ -148,8 +132,7 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/llms-full': typeof LlmsFullRoute
   '/docs/$': typeof DocsSplatRoute
-  '/docs/': typeof DocsIndexRoute
-  '/docs/$product/llms-full': typeof DocsProductLlmsFullRoute
+  '/docs/llms-full': typeof DocsLlmsFullRoute
 }
 
 export interface FileRouteTypes {
@@ -160,17 +143,9 @@ export interface FileRouteTypes {
     | '/404'
     | '/llms-full'
     | '/docs/$'
-    | '/docs'
-    | '/docs/$product/llms-full'
+    | '/docs/llms-full'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/$catchall'
-    | '/404'
-    | '/llms-full'
-    | '/docs/$'
-    | '/docs'
-    | '/docs/$product/llms-full'
+  to: '/' | '/$catchall' | '/404' | '/llms-full' | '/docs/$' | '/docs/llms-full'
   id:
     | '__root__'
     | '/'
@@ -178,8 +153,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/llms-full'
     | '/docs/$'
-    | '/docs/'
-    | '/docs/$product/llms-full'
+    | '/docs/llms-full'
   fileRoutesById: FileRoutesById
 }
 
@@ -189,8 +163,7 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   LlmsFullRoute: typeof LlmsFullRoute
   DocsSplatRoute: typeof DocsSplatRoute
-  DocsIndexRoute: typeof DocsIndexRoute
-  DocsProductLlmsFullRoute: typeof DocsProductLlmsFullRoute
+  DocsLlmsFullRoute: typeof DocsLlmsFullRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -199,8 +172,7 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   LlmsFullRoute: LlmsFullRoute,
   DocsSplatRoute: DocsSplatRoute,
-  DocsIndexRoute: DocsIndexRoute,
-  DocsProductLlmsFullRoute: DocsProductLlmsFullRoute,
+  DocsLlmsFullRoute: DocsLlmsFullRoute,
 }
 
 export const routeTree = rootRoute
@@ -218,8 +190,7 @@ export const routeTree = rootRoute
         "/404",
         "/llms-full",
         "/docs/$",
-        "/docs/",
-        "/docs/$product/llms-full"
+        "/docs/llms-full"
       ]
     },
     "/": {
@@ -237,11 +208,8 @@ export const routeTree = rootRoute
     "/docs/$": {
       "filePath": "docs.$.tsx"
     },
-    "/docs/": {
-      "filePath": "docs.index.tsx"
-    },
-    "/docs/$product/llms-full": {
-      "filePath": "docs.$product.llms-full.tsx"
+    "/docs/llms-full": {
+      "filePath": "docs.llms-full.tsx"
     }
   }
 }

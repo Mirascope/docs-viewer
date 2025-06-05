@@ -88,10 +88,10 @@ export function processDocSpec(
   const currentWeight = parentWeight * (docSpec.weight || 1.0);
 
   // Simple path construction for content loading - always include the slug
-  const path = `${pathPrefix}/${slug}`;
+  const path = pathPrefix ? `${pathPrefix}/${slug}` : slug;
 
   // For URL route path: handle index pages with trailing slashes
-  let routePath = `/docs/${pathPrefix}`;
+  let routePath = pathPrefix ? `/docs/${pathPrefix}` : `/docs`;
   if (slug !== "index") {
     routePath += `/${slug}`; // Add the slug for non-index pages
   }
@@ -136,7 +136,7 @@ export function getDocsFromSpec(fullSpec: FullDocsSpec): DocInfo[] {
     sections.forEach((section) => {
       // For the default section (index), don't add a section slug prefix
       const isDefaultSection = section.slug === "index";
-      const sectionPathPrefix = isDefaultSection ? product : `${product}/${section.slug}`;
+      const sectionPathPrefix = isDefaultSection ? "" : section.slug;
 
       // Process each document in this section
       section.children.forEach((docSpec) => {

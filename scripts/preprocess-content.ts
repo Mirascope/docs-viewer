@@ -12,14 +12,14 @@ import { MIRASCOPE } from "@/src/lib/constants/site";
 /**
  * Generate LLM content dynamically from the doc registry
  */
-function generateLLMContent(registry: DocRegistry): LLMContent[] {
-  const mirascopeChildren = include.flatTree("mirascope", registry);
+function generateLLMContent(registry: DocRegistry, contentDir: string): LLMContent[] {
+  const mirascopeChildren = include.flatTree("", registry, path.join(contentDir, "docs"));
 
   const mirascopeContent = LLMContent.fromChildren({
     slug: "mirascope",
     title: "Mirascope",
     description: MIRASCOPE.tagline,
-    route: "/docs/mirascope/llms-full",
+    route: "/docs/llms-full",
     children: mirascopeChildren,
   });
 
@@ -30,22 +30,26 @@ function generateLLMContent(registry: DocRegistry): LLMContent[] {
  * Main processing function that generates static JSON files for all MDX content,
  * processes template files, and creates a sitemap.xml file
  */
-export async function preprocessContent(verbose = true): Promise<void> {
+export async function preprocessContent(
+  options: { verbose?: boolean; contentDir?: string } = {}
+): Promise<void> {
+  const { verbose = true, contentDir = path.join(process.cwd(), "content") } = options;
+
   try {
-    // Load the registry from the local _meta.json file using fs
-    const metaPath = path.join(process.cwd(), "content", "docs", "_meta.json");
+    // Load the registry from the _meta.json file using fs
+    const metaPath = path.join(contentDir, "docs", "_meta.json");
     const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
     const validatedSpec = parseAndValidateDocsSpec(jsonData);
     const registry = new DocRegistry(validatedSpec);
 
-    const preprocessor = new ContentPreprocessor(process.cwd(), registry, verbose);
+    const preprocessor = new ContentPreprocessor(process.cwd(), registry, contentDir, verbose);
     await preprocessor.processAllContent();
 
     if (verbose) console.log("Processing LLM documents...");
-    const llmMeta = generateLLMContent(registry);
+    const llmMeta = generateLLMContent(registry, contentDir);
     await writeLLMDocuments(llmMeta, verbose);
 
-    await generateSitemap(preprocessor.getMetadataByType().blog, llmMeta);
+    await generateSitemap(preprocessor.getMetadataByType().blog, llmMeta, contentDir);
     return;
   } catch (error) {
     console.error("Error during preprocessing:", error);
@@ -81,11 +85,15 @@ async function writeLLMDocuments(llmDocs: LLMContent[], verbose = true): Promise
 /**
  * Generate sitemap.xml file based on the processed content
  */
-async function generateSitemap(blogPosts: BlogMeta[], llmDocs: LLMContent[]): Promise<void> {
+async function generateSitemap(
+  blogPosts: BlogMeta[],
+  llmDocs: LLMContent[],
+  contentDir?: string
+): Promise<void> {
   console.log("Generating sitemap.xml...");
 
   // Get all routes using our centralized utility
-  const uniqueRoutes = getAllRoutes().filter((route) => route !== "/404");
+  const uniqueRoutes = getAllRoutes(false, contentDir).filter((route) => route !== "/404");
 
   // Use the blog posts metadata
   const postsList = blogPosts || [];
@@ -156,10 +164,13 @@ interface ViteDevServer {
   };
 }
 
-export function contentPreprocessPlugin(options = { verbose: true }) {
+export function contentPreprocessPlugin(options = { verbose: true, contentDir: undefined }) {
+  const { contentDir } = options;
+  const baseContentDir = contentDir || path.join(process.cwd(), "content");
+
   // Get all content directories (docs includes LLM document templates)
   const contentDirs = ["blog", "docs", "policy", "dev"].map((type) =>
-    path.join(process.cwd(), "content", type)
+    path.join(baseContentDir, type)
   );
 
   return {
@@ -172,13 +183,12 @@ export function contentPreprocessPlugin(options = { verbose: true }) {
       // Run preprocessing when the server starts
       server.httpServer?.once("listening", async () => {
         if (verbose) console.log("Initial content preprocessing for development...");
-        await preprocessContent(verbose).catch((error) => {
+        await preprocessContent({ verbose, contentDir: baseContentDir }).catch((error) => {
           console.error("Error preprocessing content:", error);
         });
       });
 
       // Create the base content directory if it doesn't exist
-      const baseContentDir = path.join(process.cwd(), "content");
       if (!fs.existsSync(baseContentDir)) {
         fs.mkdirSync(baseContentDir, { recursive: true });
       }
@@ -204,7 +214,7 @@ export function contentPreprocessPlugin(options = { verbose: true }) {
           filePath.includes("/content/")
         ) {
           if (verbose) console.log(`Content file changed: ${filePath}`);
-          await preprocessContent(false).catch((error) => {
+          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
             console.error("Error preprocessing content after file change:", error);
           });
         }
@@ -216,7 +226,7 @@ export function contentPreprocessPlugin(options = { verbose: true }) {
           filePath.includes("/content/")
         ) {
           if (verbose) console.log(`Content file added: ${filePath}`);
-          await preprocessContent(false).catch((error) => {
+          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
             console.error("Error preprocessing content after file add:", error);
           });
         }
@@ -228,7 +238,7 @@ export function contentPreprocessPlugin(options = { verbose: true }) {
           filePath.includes("/content/")
         ) {
           if (verbose) console.log(`Content file deleted: ${filePath}`);
-          await preprocessContent(false).catch((error) => {
+          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
             console.error("Error preprocessing content after file delete:", error);
           });
         }
@@ -239,7 +249,13 @@ export function contentPreprocessPlugin(options = { verbose: true }) {
 
 // Run the preprocessing when this script is executed directly
 if (import.meta.main) {
-  preprocessContent().catch((error) => {
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const contentDirIndex = args.indexOf("--content-dir");
+  const contentDir =
+    contentDirIndex !== -1 && args[contentDirIndex + 1] ? args[contentDirIndex + 1] : undefined;
+
+  preprocessContent({ contentDir }).catch((error) => {
     console.error("Fatal error during preprocessing:", error);
     process.exit(1);
   });

@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { type BlogMeta, DocRegistry } from "@/src/lib/content";
+import { DocRegistry } from "@/src/lib/content";
 import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
 
 // Base URL for the site
@@ -104,44 +104,12 @@ export function getStaticRoutes(): string[] {
 }
 
 /**
- * Get blog post routes by scanning the content/blog directory
- */
-export function getBlogRoutes(): string[] {
-  try {
-    // First try using the posts list if it exists (for production)
-    const postsListPath = getPostsListPath();
-    if (fs.existsSync(postsListPath)) {
-      try {
-        const postsList: BlogMeta[] = JSON.parse(fs.readFileSync(postsListPath, "utf8"));
-        return postsList.map((post) => `/blog/${post.slug}`).sort();
-      } catch (error) {
-        // Fall through to the file system method if this fails
-        console.warn(`Failed to load posts list, falling back to file system: ${error}`);
-      }
-    }
-
-    // Fall back to scanning the directory (for development/tests)
-    const postsDir = path.join(getProjectRoot(), "content", "blog");
-    if (!fs.existsSync(postsDir)) {
-      throw new Error(`Blog posts directory not found at: ${postsDir}`);
-    }
-
-    // Get all .mdx files in the posts directory
-    const postFiles = fs.readdirSync(postsDir).filter((file) => file.endsWith(".mdx"));
-
-    // Convert filenames to routes by stripping the .mdx extension
-    return postFiles.map((file) => `/blog/${file.replace(".mdx", "")}`).sort();
-  } catch (error) {
-    throw new Error(`Failed to get blog routes: ${error}`);
-  }
-}
-
-/**
  * Get doc routes
  */
-export function getDocsRoutes(): string[] {
+export function getDocsRoutes(contentDir?: string): string[] {
   // Load registry synchronously from JSON file
-  const metaPath = path.join(getProjectRoot(), "content", "docs", "_meta.json");
+  const baseContentDir = contentDir || path.join(getProjectRoot(), "content");
+  const metaPath = path.join(baseContentDir, "docs", "_meta.json");
   const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
 
   // Parse and validate using shared logic
@@ -167,13 +135,12 @@ export function getLLMDocRoutes(): string[] {
 /**
  * Get all routes (static + blogs + docs + llm docs)
  */
-export function getAllRoutes(includeHidden = false): string[] {
+export function getAllRoutes(includeHidden = false, contentDir?: string): string[] {
   const staticRoutes = getStaticRoutes();
-  const blogRoutes = getBlogRoutes();
-  const docRoutes = getDocsRoutes();
+  const docRoutes = getDocsRoutes(contentDir);
   const llmDocRoutes = getLLMDocRoutes();
 
   // Combine all routes and remove duplicates
-  const allRoutes = [...staticRoutes, ...blogRoutes, ...docRoutes, ...llmDocRoutes];
+  const allRoutes = [...staticRoutes, ...docRoutes, ...llmDocRoutes];
   return [...new Set(allRoutes)].filter((route) => includeHidden || !isHiddenRoute(route)).sort();
 }

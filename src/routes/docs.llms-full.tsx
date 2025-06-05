@@ -5,23 +5,15 @@ import { ContentErrorHandler } from "@/src/components";
 import { LLMContent } from "@/src/lib/content/llm-content";
 import { loadDocRegistry } from "@/src/lib/content";
 import DocsSidebar from "@/src/components/routes/docs/DocsSidebar";
-import type { ProductName } from "@/src/lib/content/spec";
 
 /**
  * Loader for product-specific LLM document viewer routes
  * Handles routes like /docs/mirascope/llms, /docs/lilypad/llms
  */
-async function productLlmDocLoader({ params }: { params: { product: ProductName } }) {
-  const { product } = params;
-
-  // Validate product
-  if (product !== "mirascope" && product !== "lilypad") {
-    throw new Error(`Invalid product: ${product}`);
-  }
-
+async function llmDocLoader() {
   // Construct paths to both JSON and TXT files
-  const jsonPath = `/static/content/docs/${product}/llms-full.json`;
-  const txtPath = `/docs/${product}/llms-full.txt`;
+  const jsonPath = `/static/content/docs/llms-full.json`;
+  const txtPath = `/docs/llms-full.txt`;
 
   try {
     // Load registry
@@ -40,8 +32,7 @@ async function productLlmDocLoader({ params }: { params: { product: ProductName 
     return {
       content,
       txtPath,
-      viewerPath: `/docs/${product}/llms`,
-      product,
+      viewerPath: `/docs/llms`,
       registry,
     };
   } catch (error) {
@@ -50,10 +41,10 @@ async function productLlmDocLoader({ params }: { params: { product: ProductName 
   }
 }
 
-export const Route = createFileRoute("/docs/$product/llms-full")({
+export const Route = createFileRoute("/docs/llms-full")({
   component: ProductLLMDocViewerPage,
 
-  loader: productLlmDocLoader,
+  loader: llmDocLoader,
 
   pendingComponent: () => {
     return <div>Loading LLM document...</div>;
@@ -72,17 +63,17 @@ export const Route = createFileRoute("/docs/$product/llms-full")({
 
 function ProductLLMDocViewerPage() {
   const data = useLoaderData({
-    from: "/docs/$product/llms-full",
+    from: "/docs/llms-full",
     structuralSharing: false,
   });
 
-  const { content, txtPath, product, registry } = data;
+  const { content, txtPath, registry } = data;
 
   return (
     <LLMPage
       content={content}
       txtPath={txtPath}
-      leftSidebar={<DocsSidebar product={product} registry={registry} />}
+      leftSidebar={<DocsSidebar product={"mirascope"} registry={registry} />}
     />
   );
 }

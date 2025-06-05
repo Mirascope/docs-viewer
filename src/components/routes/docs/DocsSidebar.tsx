@@ -8,7 +8,6 @@ import type {
   SidebarGroup,
   SidebarSection,
 } from "@/src/components/core/layout/Sidebar";
-import { PRODUCT_CONFIGS } from "@/src/lib/constants/site";
 
 interface DocsSidebarProps {
   product: ProductName;
@@ -66,7 +65,7 @@ function createSidebarConfig(product: ProductName, registry: DocRegistry): Sideb
   // Convert doc specs to sidebar items
   function convertDocToSidebarItem(doc: DocSpec, parentPath: string = ""): SidebarItem {
     // Construct the logical path for this item (used to look up routePath)
-    const itemPath = parentPath ? `${parentPath}/${doc.slug}` : `${product}/${doc.slug}`;
+    const itemPath = parentPath ? `${parentPath}/${doc.slug}` : doc.slug;
 
     // Look up the routePath from DocInfo if available
     const routePath = slugToRoutePathMap.get(itemPath);
@@ -99,15 +98,14 @@ function createSidebarConfig(product: ProductName, registry: DocRegistry): Sideb
   // Create sidebar sections from spec sections
   const sidebarSections: SidebarSection[] = allSections.map((section) => {
     // Create basePath - for index section, don't include the section slug
-    const basePath =
-      section.slug === "index" ? `/docs/${product}` : `/docs/${product}/${section.slug}`;
+    const basePath = section.slug === "index" ? `/docs/` : `/docs/${section.slug}`;
 
     // Process direct items (those without children) and create groups for top-level folders
     const items: Record<string, SidebarItem> = {};
     const groups: Record<string, SidebarGroup> = {};
 
     // Get path prefix for section items (used for lookup)
-    const pathPrefix = section.slug === "index" ? product : `${product}/${section.slug}`;
+    const pathPrefix = section.slug === "index" ? "" : section.slug;
 
     section.children.forEach((child) => {
       if (!child.children || child.children.length === 0) {
@@ -145,17 +143,16 @@ function createSidebarConfig(product: ProductName, registry: DocRegistry): Sideb
       groups: Object.keys(groups).length > 0 ? groups : undefined,
     };
   });
-  const productTitle = PRODUCT_CONFIGS[product]?.title || product;
   // Inject LLM Documentation section
   const llmItem: SidebarItem = {
     slug: "llms",
-    label: `${productTitle} LLMs Text`,
-    routePath: `/docs/${product}/llms-full`,
+    label: `LLMs Text`,
+    routePath: `/docs/llms-full`,
   };
   const llmSection: SidebarSection = {
     slug: "llms",
     label: "LLMs Text",
-    basePath: `/docs/${product}/llms-full`,
+    basePath: `/docs/llms-full`,
     items: { llms: llmItem },
   };
 

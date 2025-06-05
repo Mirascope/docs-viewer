@@ -2,7 +2,22 @@
 
 const { spawn } = require("child_process");
 const http = require("http");
-const port = process.argv[2] || "3000";
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+let port = "3000";
+let contentDir = null;
+
+// Parse arguments
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === "--content-dir" && i + 1 < args.length) {
+    contentDir = args[i + 1];
+    i++; // Skip next argument since it's the value
+  } else if (!args[i].startsWith("--")) {
+    port = args[i]; // First non-flag argument is the port
+  }
+}
+
 const host = "127.0.0.1"; // Explicitly use IPv4 localhost address
 
 // Check if the port is in use by trying to bind to the specific address
@@ -37,8 +52,19 @@ async function start() {
     process.exit(1);
   } else {
     console.log(`Port ${port} is available. Starting server...`);
+
+    // Set up environment for vite
+    const env = { ...process.env };
+    if (contentDir) {
+      env.MIRASCOPE_CONTENT_DIR = contentDir;
+      console.log(`Using content directory: ${contentDir}`);
+    }
+
     // Force Vite to use the same host address we checked
-    spawn("bun", ["--bun", "vite", "--port", port, "--host", host], { stdio: "inherit" });
+    spawn("bun", ["--bun", "vite", "--port", port, "--host", host], {
+      stdio: "inherit",
+      env,
+    });
   }
 }
 

@@ -34,6 +34,7 @@ export interface ContentPath {
 export class ContentPreprocessor {
   // Base directories
   private readonly baseDir: string;
+  private readonly sourceContentDir: string;
   private readonly staticDir: string;
   private readonly contentDir: string;
   private readonly metaDir: string;
@@ -57,9 +58,10 @@ export class ContentPreprocessor {
   /**
    * Constructor - initializes directory structure
    */
-  constructor(baseDir: string, registry: DocRegistry, verbose = true) {
+  constructor(baseDir: string, registry: DocRegistry, sourceContentDir: string, verbose = true) {
     this.baseDir = baseDir;
     this.registry = registry;
+    this.sourceContentDir = sourceContentDir;
     this.verbose = verbose;
 
     // Create static directories
@@ -75,7 +77,7 @@ export class ContentPreprocessor {
    * Copy docs specification JSON file to static directory for client access
    */
   private copyDocsSpecToStatic(): void {
-    const sourceFile = path.join(this.baseDir, "content", "docs", "_meta.json");
+    const sourceFile = path.join(this.sourceContentDir, "docs", "_meta.json");
     const destFile = path.join(this.staticDir, "docs-spec.json");
 
     if (!fs.existsSync(sourceFile)) {
@@ -147,11 +149,10 @@ export class ContentPreprocessor {
   private async processContentType(contentType: ContentType): Promise<void> {
     if (this.verbose) console.log(`Processing ${contentType} content...`);
 
-    const srcDir = path.join(this.baseDir, "content", contentType);
+    const srcDir = path.join(this.sourceContentDir, contentType);
 
     // Skip if source directory doesn't exist
     if (!fs.existsSync(srcDir)) {
-      if (this.verbose) console.warn(`Source directory for ${contentType} not found: ${srcDir}`);
       return;
     }
 
@@ -586,15 +587,19 @@ export class ContentPreprocessor {
  * Main preprocessing function that creates the ContentPreprocessor
  * and processes all content
  */
-export async function preprocessContent(baseDir: string, verbose = true): Promise<void> {
+export async function preprocessContent(
+  baseDir: string,
+  sourceContentDir: string,
+  verbose = true
+): Promise<void> {
   try {
     // Load the registry from the local _meta.json file using fs
-    const metaPath = path.join(baseDir, "content", "docs", "_meta.json");
+    const metaPath = path.join(sourceContentDir, "docs", "_meta.json");
     const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
     const validatedSpec = parseAndValidateDocsSpec(jsonData);
     const registry = new DocRegistry(validatedSpec);
 
-    const preprocessor = new ContentPreprocessor(baseDir, registry, verbose);
+    const preprocessor = new ContentPreprocessor(baseDir, registry, sourceContentDir, verbose);
     await preprocessor.processAllContent();
   } catch (error) {
     console.error("Error during preprocessing:", error);
