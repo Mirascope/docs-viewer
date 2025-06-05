@@ -6,7 +6,6 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 import "./styles.css";
-import reportWebVitals from "./reportWebVitals.ts";
 import { initializeSynchronousHighlighter } from "@/mirascope-ui/lib/code-highlight";
 
 // Initial theme setup (later handled by ThemeSwitcher component)
@@ -90,6 +89,3 @@ if (!rootElement) {
     console.error("Error mounting app:", error);
   });
 }
-
-// Initialize web vitals reporting (it will check for consent internally)
-reportWebVitals();

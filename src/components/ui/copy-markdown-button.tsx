@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/mirascope-ui/ui/button";
 import { Clipboard, Check } from "lucide-react";
-import analyticsManager from "@/src/lib/services/analytics";
 
 interface CopyMarkdownButtonProps {
   content: string;
@@ -11,13 +10,7 @@ interface CopyMarkdownButtonProps {
   className?: string;
 }
 
-export function CopyMarkdownButton({
-  content,
-  itemId,
-  product,
-  contentType,
-  className = "",
-}: CopyMarkdownButtonProps) {
+export function CopyMarkdownButton({ content, className = "" }: CopyMarkdownButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = () => {
@@ -30,12 +23,6 @@ export function CopyMarkdownButton({
         setTimeout(() => {
           setIsCopied(false);
         }, 2000);
-
-        analyticsManager.trackCopyEvent({
-          contentType,
-          itemId,
-          product,
-        });
       })
       .catch((err) => {
         console.error("Failed to copy content: ", err);

@@ -1,11 +1,9 @@
 import { Outlet, createRootRoute, useRouterState, redirect } from "@tanstack/react-router";
 import { processRedirects } from "../lib/redirects";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect } from "react";
 import { getProductFromPath } from "../lib/utils";
 
-import { Header, Footer, CookieBanner, DevToolsButton } from "@/src/components/routes/root";
-import analyticsManager from "@/src/lib/services/analytics";
+import { Header, Footer, DevToolsButton } from "@/src/components/routes/root";
 import {
   FunModeProvider,
   ThemeProvider,
@@ -34,15 +32,6 @@ export const Route = createRootRoute({
     const router = useRouterState();
     const path = router.location.pathname;
     const isLandingPage = path === "/";
-
-    useEffect(() => {
-      analyticsManager.trackPageView(path);
-    }, [path]);
-
-    // Initialize analytics and set product on first mount
-    useEffect(() => {
-      analyticsManager.enableAnalytics();
-    }, []);
 
     return (
       <>
@@ -108,9 +97,6 @@ export const Route = createRootRoute({
               </div>
               <Footer />
             </div>
-
-            {/* Cookie consent banner - positioned in lower left corner */}
-            <CookieBanner />
           </ProductProvider>
 
           {/* Dev tools - only visible in development */}
