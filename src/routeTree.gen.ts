@@ -12,7 +12,6 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as PrivacyImport } from './routes/privacy'
-import { Route as PricingImport } from './routes/pricing'
 import { Route as LlmsFullImport } from './routes/llms-full'
 import { Route as DevImport } from './routes/dev'
 import { Route as R404Import } from './routes/404'
@@ -35,12 +34,6 @@ import { Route as DocsProductLlmsFullImport } from './routes/docs.$product.llms-
 const PrivacyRoute = PrivacyImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const PricingRoute = PricingImport.update({
-  id: '/pricing',
-  path: '/pricing',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -179,13 +172,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmsFullImport
       parentRoute: typeof rootRoute
     }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingImport
-      parentRoute: typeof rootRoute
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -299,7 +285,6 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/dev': typeof DevRouteWithChildren
   '/llms-full': typeof LlmsFullRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
@@ -319,7 +304,6 @@ export interface FileRoutesByTo {
   '/$catchall': typeof CatchallRoute
   '/404': typeof R404Route
   '/llms-full': typeof LlmsFullRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
@@ -341,7 +325,6 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/dev': typeof DevRouteWithChildren
   '/llms-full': typeof LlmsFullRoute
-  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/dev/$slug': typeof DevSlugRoute
   '/dev/audit-metadata': typeof DevAuditMetadataRoute
@@ -364,7 +347,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/dev'
     | '/llms-full'
-    | '/pricing'
     | '/privacy'
     | '/dev/$slug'
     | '/dev/audit-metadata'
@@ -383,7 +365,6 @@ export interface FileRouteTypes {
     | '/$catchall'
     | '/404'
     | '/llms-full'
-    | '/pricing'
     | '/privacy'
     | '/dev/$slug'
     | '/dev/audit-metadata'
@@ -403,7 +384,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/dev'
     | '/llms-full'
-    | '/pricing'
     | '/privacy'
     | '/dev/$slug'
     | '/dev/audit-metadata'
@@ -425,7 +405,6 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   DevRoute: typeof DevRouteWithChildren
   LlmsFullRoute: typeof LlmsFullRoute
-  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   DocsSplatRoute: typeof DocsSplatRoute
   TermsServiceRoute: typeof TermsServiceRoute
@@ -441,7 +420,6 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   DevRoute: DevRouteWithChildren,
   LlmsFullRoute: LlmsFullRoute,
-  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   DocsSplatRoute: DocsSplatRoute,
   TermsServiceRoute: TermsServiceRoute,
@@ -466,7 +444,6 @@ export const routeTree = rootRoute
         "/404",
         "/dev",
         "/llms-full",
-        "/pricing",
         "/privacy",
         "/docs/$",
         "/terms/service",
@@ -497,9 +474,6 @@ export const routeTree = rootRoute
     },
     "/llms-full": {
       "filePath": "llms-full.tsx"
-    },
-    "/pricing": {
-      "filePath": "pricing.tsx"
     },
     "/privacy": {
       "filePath": "privacy.tsx"

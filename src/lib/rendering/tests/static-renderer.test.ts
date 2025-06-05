@@ -34,12 +34,4 @@ describe("Static Renderer", () => {
     // Verify the data-product attribute is set to "mirascope" on the root div
     expect(result.html).toContain('<div data-product="mirascope"');
   });
-
-  test("renders pricing route with lilypad product attribute", async () => {
-    // Render the pricing route
-    const result = await renderRouteToString("/pricing");
-
-    // Verify the data-product attribute is set to "lilypad" on the root div
-    expect(result.html).toContain('<div data-product="lilypad"');
-  });
 });

@@ -5,7 +5,6 @@ import { useRef, useState, useEffect } from "react";
 import { ProviderContextProvider } from "@/src/components/core/providers/ProviderContext";
 import { HeroBlock } from "./HeroBlock";
 import { MirascopeBlock } from "./MirascopeBlock";
-import { LilypadBlock } from "./LilypadBlock";
 
 export function LandingPage() {
   useSunsetTime();
@@ -159,11 +158,6 @@ export function LandingPage() {
           {/* Mirascope section */}
           <div data-gradient-fade={true} ref={mirascopeSectionRef} className="mb-24">
             <MirascopeBlock onScrollDown={scrollToLilypadSection} />
-          </div>
-
-          {/* Lilypad section */}
-          <div data-gradient-fade={true} ref={lilypadSectionRef} className="mt-24">
-            <LilypadBlock onScrollToTop={scrollToHeroSection} />
           </div>
         </div>
       </ProviderContextProvider>

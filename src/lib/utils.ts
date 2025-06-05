@@ -80,16 +80,6 @@ export function getProductFromPath(path: string): ProductName {
     }
   }
 
-  // Check for docs paths that explicitly mention lilypad
-  if (path.startsWith("/docs/lilypad")) {
-    return "lilypad";
-  }
-
-  // Special case for the pricing page
-  if (path.startsWith("/pricing")) {
-    return "lilypad";
-  }
-
   // Default to mirascope for all other paths
   return "mirascope";
 }

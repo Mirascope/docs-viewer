@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import React from "react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,16 +11,7 @@ import { getProductRoute } from "@/src/lib/routes";
 import { useProduct, useIsLandingPage } from "@/src/components/core";
 import { PRODUCT_CONFIGS } from "@/src/lib/constants/site";
 import type { ProductName } from "@/src/lib/content/spec";
-import { cn } from "@/src/lib/utils";
-import { NAV_LINK_STYLES, PRODUCT_LINK_STYLES, DESKTOP_NAV_STYLES } from "./styles";
-
-// Reusable navigation link component
-interface NavLinkProps {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
+import { PRODUCT_LINK_STYLES, DESKTOP_NAV_STYLES } from "./styles";
 
 /**
  * ProductMenuLink component for product navigation links.
@@ -47,14 +37,6 @@ const ProductMenuLink = ({ productName }: ProductMenuLinkProps) => {
         </Link>
       </NavigationMenuLink>
     </li>
-  );
-};
-
-const NavLink = ({ href, children, className, onClick }: NavLinkProps) => {
-  return (
-    <Link to={href} className={cn(NAV_LINK_STYLES.base, className)} onClick={onClick}>
-      {children}
-    </Link>
   );
 };
 
@@ -91,7 +73,6 @@ export default function DesktopNavigation({ isSearchOpen }: DesktopNavigationPro
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <NavLink href="/pricing">Pricing</NavLink>
     </div>
   );
 }
