@@ -1,0 +1,40 @@
+[
+  {
+    "product": "mirascope",
+    "sections": [
+      {
+        "slug": "index",
+        "label": "Docs",
+        "weight": 2,
+        "children": [
+          {
+            "slug": "index",
+            "label": "Mirascope V2"
+          },
+          {
+            "slug": "calls",
+            "label": "Calls"
+          },
+          {
+            "slug": "streams",
+            "label": "Streams"
+          },
+          {
+            "slug": "async",
+            "label": "Async"
+          }
+        ]
+      },
+      {
+        "slug": "api",
+        "label": "API Reference",
+        "children": [
+          {
+            "slug": "index",
+            "label": "Overview"
+          }
+        ]
+      }
+    ]
+  }
+]

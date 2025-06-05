@@ -151,7 +151,7 @@ export class LLMContent {
       return formatContainerContent(this.children!);
     }
 
-    throw new Error(`Invalid LLMContent state: ${this.slug}`);
+    return "";
   }
 
   /**

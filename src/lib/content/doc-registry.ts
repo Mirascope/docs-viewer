@@ -7,14 +7,12 @@
 
 import type { FullDocsSpec, DocInfo, ProductName, ProductSpec, SectionSpec, DocSpec } from "./spec";
 import { getDocsFromSpec, processDocSpec } from "./spec";
-import fullSpec from "@/content/docs/_meta";
+import { loadJsonMeta } from "./json-meta";
 
 /**
- * DocRegistry service - Singleton for efficient document information management
+ * DocRegistry service - For efficient document information management
  */
-class DocRegistry {
-  private static instance: DocRegistry;
-
+export class DocRegistry {
   // List of all docs from the spec
   private readonly allDocs: DocInfo[];
 
@@ -25,32 +23,22 @@ class DocRegistry {
   // Product information
   private readonly products: Map<ProductName, ProductSpec>;
 
-  private constructor() {
+  constructor(spec: FullDocsSpec) {
     // Initialize lookups
     this.pathToDocInfo = new Map();
     this.routePathToDocInfo = new Map();
     this.products = new Map();
 
     // Process the full docs spec to generate all DocInfo objects
-    this.allDocs = getDocsFromSpec(fullSpec);
+    this.allDocs = getDocsFromSpec(spec);
 
     // Store product specs for access
-    fullSpec.forEach((productSpec) => {
+    spec.forEach((productSpec) => {
       this.products.set(productSpec.product, productSpec);
     });
 
     // Build lookup maps for efficient access
     this.buildLookupMaps();
-  }
-
-  /**
-   * Get the singleton instance
-   */
-  public static getInstance(): DocRegistry {
-    if (!DocRegistry.instance) {
-      DocRegistry.instance = new DocRegistry();
-    }
-    return DocRegistry.instance;
   }
 
   /**
@@ -138,17 +126,18 @@ class DocRegistry {
 
     return result;
   }
-
-  /**
-   * Get the full doc specs
-   */
-  getFullSpec(): FullDocsSpec {
-    return fullSpec;
-  }
 }
 
-// Export the singleton instance
-export const docRegistry = DocRegistry.getInstance();
+/**
+ * Load a DocRegistry from a JSON metadata file
+ *
+ * @param metaUrl - URL to the JSON metadata file
+ * @returns Promise that resolves to a DocRegistry instance
+ */
+export async function loadDocRegistry(metaUrl: string): Promise<DocRegistry> {
+  const spec = await loadJsonMeta(metaUrl);
+  return new DocRegistry(spec);
+}
 
 // Re-export types for convenience
 export type { DocInfo, ProductName, ProductSpec, SectionSpec, DocSpec };

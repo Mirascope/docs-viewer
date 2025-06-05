@@ -1,4 +1,4 @@
-import { docRegistry } from "@/src/lib/content";
+import { type DocRegistry } from "@/src/lib/content";
 import type { DocSpec, ProductName } from "@/src/lib/content/doc-registry";
 import { type Provider } from "@/src/components/mdx/providers";
 import { Sidebar } from "@/src/components";
@@ -12,6 +12,7 @@ import { PRODUCT_CONFIGS } from "@/src/lib/constants/site";
 
 interface DocsSidebarProps {
   product: ProductName;
+  registry: DocRegistry;
   selectedProvider?: Provider;
   onProviderChange?: (provider: Provider) => void;
 }
@@ -21,12 +22,12 @@ interface DocsSidebarProps {
 /**
  * Helper to convert the spec metadata to the sidebar format
  */
-function createSidebarConfig(product: ProductName): SidebarConfig {
+function createSidebarConfig(product: ProductName, registry: DocRegistry): SidebarConfig {
   // Get product spec from the registry
-  const productSpec = docRegistry.getProductSpec(product);
+  const productSpec = registry.getProductSpec(product);
 
   // Get all DocInfo objects for this product
-  const allDocInfo = docRegistry.getDocsByProduct(product);
+  const allDocInfo = registry.getDocsByProduct(product);
 
   // Create a map from slug pattern to routePath for quick lookup
   // Key format: product/section/slug or product/slug for root items
@@ -168,9 +169,9 @@ function createSidebarConfig(product: ProductName): SidebarConfig {
   };
 }
 
-const DocsSidebar = ({ product }: DocsSidebarProps) => {
+const DocsSidebar = ({ product, registry }: DocsSidebarProps) => {
   // Create sidebar configuration
-  const sidebarConfig = createSidebarConfig(product);
+  const sidebarConfig = createSidebarConfig(product, registry);
 
   // No header content needed since product links are in the main header now
   return <Sidebar config={sidebarConfig} />;

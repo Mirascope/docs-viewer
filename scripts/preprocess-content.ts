@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { ContentPreprocessor } from "@/src/lib/content/preprocess";
+import { DocRegistry } from "@/src/lib/content";
+import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
 import type { LLMContent } from "@/src/lib/content/llm-content";
 import { SITE_URL, getAllRoutes } from "@/src/lib/router-utils";
 import type { BlogMeta } from "@/src/lib/content";
@@ -12,7 +14,13 @@ import llmMeta from "@/content/llms/_llms-meta";
  */
 export async function preprocessContent(verbose = true): Promise<void> {
   try {
-    const preprocessor = new ContentPreprocessor(process.cwd(), verbose);
+    // Load the registry from the local _meta.json file using fs
+    const metaPath = path.join(process.cwd(), "content", "docs", "_meta.json");
+    const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+    const validatedSpec = parseAndValidateDocsSpec(jsonData);
+    const registry = new DocRegistry(validatedSpec);
+
+    const preprocessor = new ContentPreprocessor(process.cwd(), registry, verbose);
     await preprocessor.processAllContent();
 
     if (verbose) console.log("Processing LLM documents...");

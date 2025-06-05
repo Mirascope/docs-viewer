@@ -9,10 +9,11 @@ import {
 import TocSidebar from "./TocSidebar";
 import MainContent from "./MainContent";
 import DocsSidebar from "./DocsSidebar";
-import type { DocContent } from "@/src/lib/content";
+import type { DocContent, DocRegistry } from "@/src/lib/content";
 
 type DocsPageProps = {
   document?: DocContent;
+  registry?: DocRegistry;
   isLoading?: boolean;
 };
 
@@ -22,7 +23,7 @@ type DocsPageProps = {
  * Handles metadata, layout and content rendering for all documentation pages
  * Supports both loaded and loading states
  */
-const DocsPage: React.FC<DocsPageProps> = ({ document, isLoading = false }) => {
+const DocsPage: React.FC<DocsPageProps> = ({ document, registry, isLoading = false }) => {
   // Extract metadata for SEO (use defaults when loading)
   const meta = document?.meta || {
     title: "Loading...",
@@ -38,7 +39,7 @@ const DocsPage: React.FC<DocsPageProps> = ({ document, isLoading = false }) => {
       <ProviderContextProvider>
         <AppLayout>
           <AppLayout.LeftSidebar className="pt-1" collapsible={true}>
-            <DocsSidebar product={product} />
+            <DocsSidebar product={product} registry={registry!} />
           </AppLayout.LeftSidebar>
 
           <AppLayout.Content>

@@ -1,5 +1,4 @@
 import { LLMContent } from "@/src/lib/content/llm-content";
-import { include } from "@/src/lib/content/llm-includes";
 import { MIRASCOPE } from "@/src/lib/constants/site";
 
 export const mirascopeContent = LLMContent.fromChildren({
@@ -7,7 +6,7 @@ export const mirascopeContent = LLMContent.fromChildren({
   title: "Mirascope",
   description: MIRASCOPE.tagline,
   route: "/docs/mirascope/llms-full",
-  children: include.directory("mirascope/"),
+  children: [],
 });
 
 export default mirascopeContent;

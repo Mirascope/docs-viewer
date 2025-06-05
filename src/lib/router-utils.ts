@@ -2,7 +2,8 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getAllDocInfo, type BlogMeta } from "@/src/lib/content";
+import { type BlogMeta, DocRegistry } from "@/src/lib/content";
+import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
 import llmMeta from "@/content/llms/_llms-meta";
 import type { LLMContent } from "@/src/lib/content/llm-content";
 
@@ -141,7 +142,15 @@ export function getBlogRoutes(): string[] {
  * Get doc routes
  */
 export function getDocsRoutes(): string[] {
-  const allDocs = getAllDocInfo();
+  // Load registry synchronously from JSON file
+  const metaPath = path.join(getProjectRoot(), "content", "docs", "_meta.json");
+  const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+
+  // Parse and validate using shared logic
+  const validatedSpec = parseAndValidateDocsSpec(jsonData);
+
+  const registry = new DocRegistry(validatedSpec);
+  const allDocs = registry.getAllDocs();
   return allDocs
     .map((doc) => {
       return doc.routePath;

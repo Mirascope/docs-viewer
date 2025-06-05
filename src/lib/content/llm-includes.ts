@@ -7,9 +7,9 @@
 
 import fs from "fs";
 import path from "path";
-import { getAllDocInfo } from "./content";
 import { parseFrontmatter } from "./mdx-processing";
 import type { DocInfo } from "./spec";
+import type { DocRegistry } from "./doc-registry";
 import { LLMContent } from "./llm-content";
 import { BASE_URL } from "@/src/lib/constants/site";
 
@@ -104,8 +104,8 @@ export const include = {
    * Include a single specific document by exact path
    * Returns a single LLMContent instance
    */
-  file: (pattern: string, docsRoot?: string): LLMContent => {
-    const allDocs = getAllDocInfo();
+  file: (pattern: string, registry: DocRegistry, docsRoot?: string): LLMContent => {
+    const allDocs = registry.getAllDocs();
     const matchingDocs = filterDocsByPattern(allDocs, pattern, "exact");
 
     if (matchingDocs.length === 0) {
@@ -123,8 +123,8 @@ export const include = {
    * Include direct children of a directory (no subdirectories)
    * Returns an array of LLMContent instances
    */
-  directory: (pattern: string, docsRoot?: string): LLMContent[] => {
-    const allDocs = getAllDocInfo();
+  directory: (pattern: string, registry: DocRegistry, docsRoot?: string): LLMContent[] => {
+    const allDocs = registry.getAllDocs();
     const matchingDocs = filterDocsByPattern(allDocs, pattern, "directory");
 
     if (matchingDocs.length === 0) {
@@ -138,8 +138,8 @@ export const include = {
    * Include all content recursively under a path (flat list)
    * Returns an array of LLMContent instances
    */
-  flatTree: (pattern: string, docsRoot?: string): LLMContent[] => {
-    const allDocs = getAllDocInfo();
+  flatTree: (pattern: string, registry: DocRegistry, docsRoot?: string): LLMContent[] => {
+    const allDocs = registry.getAllDocs();
     const matchingDocs = filterDocsByPattern(allDocs, pattern, "tree");
 
     if (matchingDocs.length === 0) {

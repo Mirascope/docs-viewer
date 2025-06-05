@@ -3,8 +3,9 @@ import { LLMPage } from "@/src/components/routes/llms";
 import { environment } from "@/src/lib/content/environment";
 import { ContentErrorHandler } from "@/src/components";
 import { LLMContent } from "@/src/lib/content/llm-content";
+import { loadDocRegistry } from "@/src/lib/content";
 import DocsSidebar from "@/src/components/routes/docs/DocsSidebar";
-import type { ProductName } from "@/src/lib/content/doc-registry";
+import type { ProductName } from "@/src/lib/content/spec";
 import { ButtonLink } from "@/mirascope-ui/ui/button-link";
 
 /**
@@ -24,6 +25,9 @@ async function productLlmDocLoader({ params }: { params: { product: ProductName 
   const txtPath = `/docs/${product}/llms-full.txt`;
 
   try {
+    // Load registry
+    const registry = await loadDocRegistry("/static/docs-spec.json");
+
     // Fetch the processed JSON data
     const response = await environment.fetch(jsonPath);
 
@@ -39,6 +43,7 @@ async function productLlmDocLoader({ params }: { params: { product: ProductName 
       txtPath,
       viewerPath: `/docs/${product}/llms`,
       product,
+      registry,
     };
   } catch (error) {
     console.error(`Error loading LLM doc: ${jsonPath}`, error);
@@ -72,13 +77,13 @@ function ProductLLMDocViewerPage() {
     structuralSharing: false,
   });
 
-  const { content, txtPath, product } = data;
+  const { content, txtPath, product, registry } = data;
 
   return (
     <LLMPage
       content={content}
       txtPath={txtPath}
-      leftSidebar={<DocsSidebar product={product} />}
+      leftSidebar={<DocsSidebar product={product} registry={registry} />}
       rightSidebarExtra={
         <ButtonLink variant="outline" href="/llms-full">
           Cross-Product LLM Docs

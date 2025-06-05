@@ -8,8 +8,9 @@ import {
   type BlogMeta,
   type DocMeta,
   type PolicyMeta,
-  docRegistry,
 } from "./content";
+import { DocRegistry } from "./content";
+import { parseAndValidateDocsSpec } from "./json-meta";
 import { parseFrontmatter } from "./mdx-processing";
 
 /**
@@ -37,6 +38,9 @@ export class ContentPreprocessor {
   private readonly contentDir: string;
   private readonly metaDir: string;
 
+  // Registry for document information
+  private readonly registry: DocRegistry;
+
   // Content tracking with type-specific collections
   private blogMetadata: BlogMeta[] = [];
   private docMetadata: DocMeta[] = [];
@@ -53,8 +57,9 @@ export class ContentPreprocessor {
   /**
    * Constructor - initializes directory structure
    */
-  constructor(baseDir: string, verbose = true) {
+  constructor(baseDir: string, registry: DocRegistry, verbose = true) {
     this.baseDir = baseDir;
+    this.registry = registry;
     this.verbose = verbose;
 
     // Create static directories
@@ -64,6 +69,30 @@ export class ContentPreprocessor {
 
     // Initialize directory structure
     this.initializeDirectories();
+  }
+
+  /**
+   * Copy docs specification JSON file to static directory for client access
+   */
+  private copyDocsSpecToStatic(): void {
+    const sourceFile = path.join(this.baseDir, "content", "docs", "_meta.json");
+    const destFile = path.join(this.staticDir, "docs-spec.json");
+
+    if (!fs.existsSync(sourceFile)) {
+      this.addError(`Docs spec file not found: ${sourceFile}`);
+      return;
+    }
+
+    try {
+      fs.copyFileSync(sourceFile, destFile);
+      if (this.verbose) {
+        console.log(`Copied docs spec: ${sourceFile} -> ${destFile}`);
+      }
+    } catch (error) {
+      this.addError(
+        `Failed to copy docs spec file: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   /**
@@ -87,6 +116,9 @@ export class ContentPreprocessor {
    */
   async processAllContent(): Promise<void> {
     if (this.verbose) console.log("Processing all content...");
+
+    // Copy docs spec JSON to static directory for client access
+    this.copyDocsSpecToStatic();
 
     // Process each content type
     for (const contentType of CONTENT_TYPES) {
@@ -209,7 +241,7 @@ export class ContentPreprocessor {
 
       case "docs":
         // Use the DocRegistry to get the pre-calculated routePath
-        const docInfo = docRegistry.getDocInfoByPath(contentPath.subpath);
+        const docInfo = this.registry.getDocInfoByPath(contentPath.subpath);
 
         if (docInfo) {
           return docInfo.routePath;
@@ -369,8 +401,8 @@ export class ContentPreprocessor {
         // Check product if not in path
         if (!product) missingFields.push("product");
 
-        // Find matching DocInfo from docRegistry to get section path and search weight
-        const docInfo = docRegistry.getDocInfoByPath(contentPath.subpath);
+        // Find matching DocInfo from registry to get section path and search weight
+        const docInfo = this.registry.getDocInfoByPath(contentPath.subpath);
 
         if (!docInfo) {
           throw new Error(
@@ -556,7 +588,13 @@ export class ContentPreprocessor {
  */
 export async function preprocessContent(baseDir: string, verbose = true): Promise<void> {
   try {
-    const preprocessor = new ContentPreprocessor(baseDir, verbose);
+    // Load the registry from the local _meta.json file using fs
+    const metaPath = path.join(baseDir, "content", "docs", "_meta.json");
+    const jsonData = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+    const validatedSpec = parseAndValidateDocsSpec(jsonData);
+    const registry = new DocRegistry(validatedSpec);
+
+    const preprocessor = new ContentPreprocessor(baseDir, registry, verbose);
     await preprocessor.processAllContent();
   } catch (error) {
     console.error("Error during preprocessing:", error);

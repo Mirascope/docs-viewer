@@ -14,11 +14,11 @@
 
 import { environment } from "./environment";
 import { processMDXContent } from "./mdx-processing";
-import { docRegistry, type DocInfo } from "./doc-registry";
+import { loadDocRegistry, DocRegistry } from "./doc-registry";
 import { type TOCItem } from "@/src/components/core/navigation";
 
-// Re-export docRegistry for convenience
-export { docRegistry };
+// Re-export doc registry for convenience
+export { loadDocRegistry, DocRegistry };
 
 /* ========== CONTENT TYPES =========== */
 
@@ -341,15 +341,6 @@ export async function getAllBlogMeta(): Promise<BlogMeta[]> {
  */
 export async function getDocContent(path: string): Promise<DocContent> {
   return loadContent<DocMeta>(path, "docs");
-}
-
-/**
- * Get basic info (not full metadata) for all available docs, based on the spec.
- *
- * @returns Array of DocInfo objects with path info
- */
-export function getAllDocInfo(): DocInfo[] {
-  return docRegistry.getAllDocs();
 }
 
 /**

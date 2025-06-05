@@ -1,6 +1,6 @@
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 import { DocsPage } from "@/src/components/routes/docs";
-import { getDocContent, docRegistry } from "@/src/lib/content";
+import { getDocContent, loadDocRegistry } from "@/src/lib/content";
 import { environment } from "@/src/lib/content/environment";
 import { ContentErrorHandler } from "@/src/components";
 
@@ -20,8 +20,11 @@ async function contentPathLoader({ params }: { params: { _splat: string } }) {
   }
 
   try {
-    // Look up DocInfo for this route path using the docRegistry
-    const docInfo = docRegistry.getDocInfoByRoutePath(routePath);
+    // Load registry first
+    const registry = await loadDocRegistry("/static/docs-spec.json");
+
+    // Look up DocInfo for this route path using the registry
+    const docInfo = registry.getDocInfoByRoutePath(routePath);
 
     if (!docInfo) {
       console.error(`No DocInfo found for route path: ${routePath}`);
@@ -30,7 +33,13 @@ async function contentPathLoader({ params }: { params: { _splat: string } }) {
 
     // Use the content path from DocInfo to load the content
     // This uses the path property which is the doc-relative path
-    return await getDocContent(docInfo.path);
+    const content = await getDocContent(docInfo.path);
+
+    // Return both content and registry for component use
+    return {
+      content,
+      registry,
+    };
   } catch (error) {
     console.error(`Error loading doc for route path: ${routePath}`, error);
     throw error;
@@ -61,11 +70,11 @@ export const Route = createFileRoute("/docs/$")({
 
 function DocsContentPage() {
   // Get the loaded data from the loader
-  const document = useLoaderData({
+  const { content, registry } = useLoaderData({
     from: "/docs/$",
     structuralSharing: false,
   });
 
   // Use the shared DocsPage component
-  return <DocsPage document={document} />;
+  return <DocsPage document={content} registry={registry} />;
 }
