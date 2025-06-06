@@ -84,11 +84,21 @@ async function start() {
         host,
       ],
       {
-        stdio: "inherit",
+        stdio: ["inherit", "inherit", "pipe"], // Capture stderr for better error handling
         env,
         // Don't change cwd - run from where dependencies are available
       }
     );
+
+    // Capture stderr to provide better error messages
+    let errorOutput = "";
+    if (child.stderr) {
+      child.stderr.on("data", (data) => {
+        const output = data.toString();
+        errorOutput += output;
+        process.stderr.write(output); // Still show errors in real-time
+      });
+    }
 
     // Improve error handling
     child.on("error", (error: Error) => {
@@ -102,6 +112,20 @@ async function start() {
         if (signal) {
           console.error(`Server killed with signal ${signal}`);
         }
+
+        // Show captured error output for debugging
+        if (errorOutput.trim()) {
+          console.error("\n--- Detailed Error Output ---");
+          console.error(errorOutput.trim());
+          console.error("--- End Error Output ---\n");
+        }
+
+        // Provide helpful debugging information
+        console.error("\nDebugging information:");
+        console.error(`- Config file: ${path.join(websiteDir, "vite.config.ts")}`);
+        console.error(`- Working directory: ${process.cwd()}`);
+        console.error(`- Docs viewer directory: ${websiteDir}`);
+        console.error(`- Content directory: ${env.MIRASCOPE_CONTENT_DIR || "not set"}`);
       }
     });
   }
