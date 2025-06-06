@@ -1,7 +1,10 @@
 {
   "name": "@mirascope/docs-viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
+  "bin": {
+    "docs-viewer": "scripts/start.js"
+  },
   "scripts": {
     "start": "node scripts/start.js",
     "dev": "bun --bun vite",

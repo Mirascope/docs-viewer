@@ -9,6 +9,8 @@ import { pagefindDevPlugin } from "./scripts/pagefind-dev-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Use DOCS_VIEWER_DIR if available, otherwise current directory
+  root: process.env.DOCS_VIEWER_DIR || process.cwd(),
   plugins: [
     TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
@@ -22,7 +24,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": resolve(process.cwd(), "./"),
+      "@": resolve(process.env.DOCS_VIEWER_DIR || process.cwd(), "./"),
     },
   },
   // Add node-specific configuration for fs and path

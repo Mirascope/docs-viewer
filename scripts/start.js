@@ -66,11 +66,43 @@ async function start() {
       console.log(`Using content directory: ${resolvedContentDir}`);
     }
 
+    // Set the docs viewer directory in environment for vite config
+    env.DOCS_VIEWER_DIR = websiteDir;
+
     // Force Vite to use the same host address we checked
-    spawn("bun", ["--bun", "vite", "--port", port, "--host", host], {
-      stdio: "inherit",
-      env,
-      cwd: websiteDir, // Run from the website directory
+    // Run from current working directory where dependencies are installed
+    const child = spawn(
+      "bun",
+      [
+        "--bun",
+        "vite",
+        "--config",
+        path.join(websiteDir, "vite.config.mjs"),
+        "--port",
+        port,
+        "--host",
+        host,
+      ],
+      {
+        stdio: "inherit",
+        env,
+        // Don't change cwd - run from where dependencies are available
+      }
+    );
+
+    // Improve error handling
+    child.on("error", (error) => {
+      console.error(`Failed to start server: ${error.message}`);
+      process.exit(1);
+    });
+
+    child.on("exit", (code, signal) => {
+      if (code !== 0) {
+        console.error(`Server exited with code ${code}`);
+        if (signal) {
+          console.error(`Server killed with signal ${signal}`);
+        }
+      }
     });
   }
 }
