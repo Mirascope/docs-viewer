@@ -1,5 +1,6 @@
 {
   "name": "@mirascope/docs-viewer",
+  "version": "0.1.0",
   "private": false,
   "scripts": {
     "start": "node scripts/start.js",
