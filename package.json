@@ -1,6 +1,6 @@
 {
-  "name": "mirascope-website",
-  "private": true,
+  "name": "@mirascope/docs-viewer",
+  "private": false,
   "scripts": {
     "start": "node scripts/start.js",
     "dev": "bun --bun vite",
