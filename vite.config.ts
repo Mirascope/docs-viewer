@@ -3,25 +3,12 @@ import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { resolve } from "node:path";
-import { contentPreprocessPlugin } from "./scripts/preprocess-content";
-import { json404Middleware } from "./scripts/json-404-middleware";
-import { pagefindDevPlugin } from "./scripts/pagefind-dev-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   // Use DOCS_VIEWER_DIR if available, otherwise current directory
   root: process.env.DOCS_VIEWER_DIR || process.cwd(),
-  plugins: [
-    TanStackRouterVite({ autoCodeSplitting: true }),
-    viteReact(),
-    tailwindcss(),
-    contentPreprocessPlugin({
-      verbose: true,
-      contentDir: process.env.MIRASCOPE_CONTENT_DIR as string | undefined,
-    }) as any,
-    json404Middleware(),
-    pagefindDevPlugin(),
-  ],
+  plugins: [TanStackRouterVite({ autoCodeSplitting: true }), viteReact(), tailwindcss()],
   resolve: {
     alias: {
       "@": resolve(process.env.DOCS_VIEWER_DIR || process.cwd(), "./"),
