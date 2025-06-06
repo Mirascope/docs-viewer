@@ -42,7 +42,9 @@ export async function preprocessContent(
     const validatedSpec = parseAndValidateDocsSpec(jsonData);
     const registry = new DocRegistry(validatedSpec);
 
-    const preprocessor = new ContentPreprocessor(process.cwd(), registry, contentDir, verbose);
+    // Use DOCS_VIEWER_DIR if available, otherwise current working directory
+    const baseDir = process.env.DOCS_VIEWER_DIR || process.cwd();
+    const preprocessor = new ContentPreprocessor(baseDir, registry, contentDir, verbose);
     await preprocessor.processAllContent();
 
     if (verbose) console.log("Processing LLM documents...");
