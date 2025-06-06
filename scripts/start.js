@@ -2,6 +2,7 @@
 
 const { spawn } = require("child_process");
 const http = require("http");
+const path = require("path");
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -53,17 +54,23 @@ async function start() {
   } else {
     console.log(`Port ${port} is available. Starting server...`);
 
+    // Get the website directory (parent of scripts directory)
+    const websiteDir = path.dirname(__dirname);
+
     // Set up environment for vite
     const env = { ...process.env };
     if (contentDir) {
-      env.MIRASCOPE_CONTENT_DIR = contentDir;
-      console.log(`Using content directory: ${contentDir}`);
+      // Resolve contentDir relative to the original working directory
+      const resolvedContentDir = path.resolve(process.cwd(), contentDir);
+      env.MIRASCOPE_CONTENT_DIR = resolvedContentDir;
+      console.log(`Using content directory: ${resolvedContentDir}`);
     }
 
     // Force Vite to use the same host address we checked
     spawn("bun", ["--bun", "vite", "--port", port, "--host", host], {
       stdio: "inherit",
       env,
+      cwd: websiteDir, // Run from the website directory
     });
   }
 }
