@@ -15,10 +15,10 @@ export default defineConfig({
     TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
     tailwindcss(),
-    contentPreprocessPlugin({ 
-      verbose: true, 
-      contentDir: process.env.MIRASCOPE_CONTENT_DIR 
-    }),
+    contentPreprocessPlugin({
+      verbose: true,
+      contentDir: process.env.MIRASCOPE_CONTENT_DIR as string | undefined,
+    }) as any,
     json404Middleware(),
     pagefindDevPlugin(),
   ],

@@ -1,13 +1,13 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
-const { spawn } = require("child_process");
-const http = require("http");
-const path = require("path");
+import { spawn } from "child_process";
+import http from "http";
+import path from "path";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
 let port = "3000";
-let contentDir = null;
+let contentDir: string | null = null;
 
 // Parse arguments
 for (let i = 0; i < args.length; i++) {
@@ -22,11 +22,11 @@ for (let i = 0; i < args.length; i++) {
 const host = "127.0.0.1"; // Explicitly use IPv4 localhost address
 
 // Check if the port is in use by trying to bind to the specific address
-function checkPort(port) {
+function checkPort(port: string): Promise<boolean> {
   return new Promise((resolve) => {
     const server = http.createServer();
 
-    server.on("error", (e) => {
+    server.on("error", (e: any) => {
       if (e.code === "EADDRINUSE") {
         console.error(`Error: Port ${port} is already in use. Please try another port.`);
         resolve(false);
@@ -37,7 +37,7 @@ function checkPort(port) {
     });
 
     // Bind to the same address we'll use for Vite
-    server.listen(port, host, () => {
+    server.listen(parseInt(port), host, () => {
       server.close(() => {
         resolve(true);
       });
@@ -77,7 +77,7 @@ async function start() {
         "--bun",
         "vite",
         "--config",
-        path.join(websiteDir, "vite.config.mjs"),
+        path.join(websiteDir, "vite.config.ts"),
         "--port",
         port,
         "--host",
@@ -91,12 +91,12 @@ async function start() {
     );
 
     // Improve error handling
-    child.on("error", (error) => {
+    child.on("error", (error: Error) => {
       console.error(`Failed to start server: ${error.message}`);
       process.exit(1);
     });
 
-    child.on("exit", (code, signal) => {
+    child.on("exit", (code: number | null, signal: NodeJS.Signals | null) => {
       if (code !== 0) {
         console.error(`Server exited with code ${code}`);
         if (signal) {

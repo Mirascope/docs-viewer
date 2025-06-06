@@ -164,7 +164,9 @@ interface ViteDevServer {
   };
 }
 
-export function contentPreprocessPlugin(options = { verbose: true, contentDir: undefined }) {
+export function contentPreprocessPlugin(
+  options: { verbose?: boolean; contentDir?: string } = { verbose: true, contentDir: undefined }
+) {
   const { contentDir } = options;
   const baseContentDir = contentDir || path.join(process.cwd(), "content");
 
@@ -174,7 +176,7 @@ export function contentPreprocessPlugin(options = { verbose: true, contentDir: u
   return {
     name: "content-preprocess-plugin",
     // Only apply during development
-    apply: "serve",
+    apply: "serve" as const,
     configureServer(server: ViteDevServer) {
       const { verbose } = options;
 

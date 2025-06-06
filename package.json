@@ -1,12 +1,13 @@
 {
   "name": "@mirascope/docs-viewer",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "private": false,
+  "type": "module",
   "bin": {
-    "docs-viewer": "scripts/start.js"
+    "docs-viewer": "scripts/start.ts"
   },
   "scripts": {
-    "start": "node scripts/start.js",
+    "start": "bun scripts/start.ts",
     "dev": "bun --bun vite",
     "preprocess-content": "bun run scripts/preprocess-content.ts",
     "enumerate-routes": "bun run scripts/enumerate-routes.ts",
@@ -36,7 +37,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md,mdx}": "prettier --write",
     "*.{ts,tsx}": [
-      "node scripts/check-ts.js"
+      "bun scripts/check-ts.ts"
     ],
     "*.mdx": [
       "bun run lint:mdx"
