@@ -27,19 +27,6 @@ jobs:
           rm -rf node_modules bun.lock
           bun install
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Create Python virtual environment
-        run: uv venv
-
       - name: TypeScript Check
         run: bun run typecheck
 
@@ -48,9 +35,6 @@ jobs:
 
       - name: MDX Validation
         run: bun run lint:mdx
-
-      - name: Check & Validate apigen module
-        run: bun run lint:python
 
       - name: Build
         run: bun run build
