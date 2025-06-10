@@ -12,9 +12,13 @@ import type { BlogMeta } from "@/src/lib/content";
  * processes template files, and creates a sitemap.xml file
  */
 export async function preprocessContent(
-  options: { verbose?: boolean; contentDir?: string } = {}
+  options: { verbose?: boolean; contentDir?: string; workingDir?: string } = {}
 ): Promise<void> {
-  const { verbose = true, contentDir = path.join(process.cwd(), "content") } = options;
+  const {
+    verbose = true,
+    contentDir = path.join(process.cwd(), "content"),
+    workingDir = path.join(process.cwd(), "dist"),
+  } = options;
 
   try {
     // Load the registry from the _meta.json file using fs
@@ -23,9 +27,7 @@ export async function preprocessContent(
     const validatedSpec = parseAndValidateDocsSpec(jsonData);
     const registry = new DocRegistry(validatedSpec);
 
-    // Use DOCS_VIEWER_DIR if available, otherwise current working directory
-    const baseDir = process.env.DOCS_VIEWER_DIR || process.cwd();
-    const preprocessor = new ContentPreprocessor(baseDir, registry, contentDir, verbose);
+    const preprocessor = new ContentPreprocessor(workingDir, registry, contentDir, verbose);
     await preprocessor.processAllContent();
 
     await generateSitemap(
@@ -115,10 +117,15 @@ async function generateSitemap(
 import type { ViteDevServer } from "vite";
 
 export function contentPreprocessPlugin(
-  options: { verbose?: boolean; contentDir?: string } = { verbose: true, contentDir: undefined }
+  options: { verbose?: boolean; contentDir?: string; workingDir?: string } = {
+    verbose: true,
+    contentDir: undefined,
+    workingDir: undefined,
+  }
 ) {
-  const { verbose = true, contentDir } = options;
-  const baseContentDir = contentDir || path.join(process.cwd(), "content");
+  let { verbose = true, contentDir, workingDir } = options;
+  contentDir = contentDir || path.join(process.cwd(), "content");
+  workingDir = workingDir || path.join(process.cwd(), "dist");
 
   return {
     name: "content-preprocess-plugin",
@@ -126,20 +133,20 @@ export function contentPreprocessPlugin(
 
     // Run initial preprocessing when plugin loads
     buildStart() {
-      preprocessContent({ verbose, contentDir: baseContentDir }).catch((error) => {
+      preprocessContent({ verbose, contentDir, workingDir }).catch((error) => {
         console.error("Error preprocessing content:", error);
       });
     },
 
     configureServer(server: ViteDevServer) {
       // Watch content directory for changes
-      server.watcher.add(baseContentDir);
+      server.watcher.add(contentDir);
 
       // Re-run preprocessing when content files change
       server.watcher.on("change", (filePath: string) => {
         if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
           console.log(`Content file changed: ${path.relative(process.cwd(), filePath)}`);
-          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+          preprocessContent({ verbose: false, contentDir, workingDir }).catch((error) => {
             console.error("Error preprocessing content after change:", error);
           });
         }
@@ -148,7 +155,7 @@ export function contentPreprocessPlugin(
       server.watcher.on("add", (filePath: string) => {
         if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
           console.log(`Content file added: ${path.relative(process.cwd(), filePath)}`);
-          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+          preprocessContent({ verbose: false, contentDir, workingDir }).catch((error) => {
             console.error("Error preprocessing content after add:", error);
           });
         }
@@ -157,7 +164,7 @@ export function contentPreprocessPlugin(
       server.watcher.on("unlink", (filePath: string) => {
         if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
           console.log(`Content file deleted: ${path.relative(process.cwd(), filePath)}`);
-          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+          preprocessContent({ verbose: false, contentDir, workingDir }).catch((error) => {
             console.error("Error preprocessing content after delete:", error);
           });
         }
@@ -171,10 +178,14 @@ if (import.meta.main) {
   // Parse command line arguments
   const args = process.argv.slice(2);
   const contentDirIndex = args.indexOf("--content-dir");
+  const workingDirIndex = args.indexOf("--working-dir");
+
   const contentDir =
     contentDirIndex !== -1 && args[contentDirIndex + 1] ? args[contentDirIndex + 1] : undefined;
+  const workingDir =
+    workingDirIndex !== -1 && args[workingDirIndex + 1] ? args[workingDirIndex + 1] : undefined;
 
-  preprocessContent({ contentDir }).catch((error) => {
+  preprocessContent({ contentDir, workingDir }).catch((error) => {
     console.error("Fatal error during preprocessing:", error);
     process.exit(1);
   });

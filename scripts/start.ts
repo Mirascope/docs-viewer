@@ -4,19 +4,25 @@ import { createServer } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-import { json404Middleware } from "./json-404-middleware.js";
+import { json404Middleware } from "./json-404-middleware.ts";
+import { contentPreprocessPlugin } from "./preprocess-content.ts";
 import http from "http";
 import path from "path";
+import fs from "fs";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
 let port = "3000";
-let contentDir: string | null = null;
+let contentDir = "./content";
+let workingDir = "./dist";
 
 // Parse arguments
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--content-dir" && i + 1 < args.length) {
     contentDir = args[i + 1];
+    i++; // Skip next argument since it's the value
+  } else if (args[i] === "--working-dir" && i + 1 < args.length) {
+    workingDir = args[i + 1];
     i++; // Skip next argument since it's the value
   } else if (!args[i].startsWith("--")) {
     port = args[i]; // First non-flag argument is the port
@@ -24,6 +30,59 @@ for (let i = 0; i < args.length; i++) {
 }
 
 const host = "127.0.0.1"; // Explicitly use IPv4 localhost address
+
+// Validate that a directory exists and has the required permissions
+function validateDirectory(dir: string, permissions: number, description: string): void {
+  if (!fs.existsSync(dir)) {
+    throw new Error(`${description} does not exist: ${dir}`);
+  }
+
+  try {
+    fs.accessSync(dir, permissions);
+  } catch (error) {
+    const permStr = permissions === fs.constants.R_OK ? "readable" : "writable";
+    throw new Error(`${description} is not ${permStr}: ${dir}`);
+  }
+}
+
+// Setup working directory by wiping and recreating it
+function setupWorkingDirectory(workingDir: string): void {
+  const resolvedWorkingDir = path.resolve(workingDir);
+
+  // Remove existing directory if it exists
+  if (fs.existsSync(resolvedWorkingDir)) {
+    fs.rmSync(resolvedWorkingDir, { recursive: true, force: true });
+  }
+
+  // Create fresh directory
+  fs.mkdirSync(resolvedWorkingDir, { recursive: true });
+
+  // Validate we can write to it
+  validateDirectory(resolvedWorkingDir, fs.constants.W_OK, "Working directory");
+
+  console.log(`Working directory setup: ${resolvedWorkingDir}`);
+}
+
+// Copy static assets from docs-viewer to working directory
+function copyStaticAssets(docsViewerDir: string, workingDir: string): void {
+  const resolvedWorkingDir = path.resolve(workingDir);
+
+  // Copy public directory if it exists
+  const publicSrc = path.join(docsViewerDir, "public");
+  const publicDest = path.join(resolvedWorkingDir, "public");
+  if (fs.existsSync(publicSrc)) {
+    fs.cpSync(publicSrc, publicDest, { recursive: true });
+    console.log(`Copied public assets: ${publicSrc} -> ${publicDest}`);
+  }
+
+  // Copy index.html if it exists
+  const indexSrc = path.join(docsViewerDir, "index.html");
+  const indexDest = path.join(resolvedWorkingDir, "index.html");
+  if (fs.existsSync(indexSrc)) {
+    fs.copyFileSync(indexSrc, indexDest);
+    console.log(`Copied index.html: ${indexSrc} -> ${indexDest}`);
+  }
+}
 
 // Check if the port is in use by trying to bind to the specific address
 function checkPort(port: string): Promise<boolean> {
@@ -58,34 +117,42 @@ async function start() {
   } else {
     console.log(`Port ${port} is available. Starting server...`);
 
-    // Get the website directory (parent of scripts directory)
-    const websiteDir = path.dirname(__dirname);
+    // Get the docs viewer directory (parent of scripts directory)
+    const docsViewerDir = path.dirname(__dirname);
 
-    // Set up environment variables
-    if (contentDir) {
-      // Resolve contentDir relative to the original working directory
-      const resolvedContentDir = path.resolve(process.cwd(), contentDir);
-      process.env.MIRASCOPE_CONTENT_DIR = resolvedContentDir;
-      console.log(`Using content directory: ${resolvedContentDir}`);
-    }
+    // Resolve directories relative to the original working directory
+    const resolvedContentDir = path.resolve(process.cwd(), contentDir);
+    const resolvedWorkingDir = path.resolve(process.cwd(), workingDir);
 
-    // Set the docs viewer directory in environment for vite config
-    process.env.DOCS_VIEWER_DIR = websiteDir;
+    // Validate directories
+    validateDirectory(docsViewerDir, fs.constants.R_OK, "Docs viewer directory");
+    validateDirectory(resolvedContentDir, fs.constants.R_OK, "Content directory");
+
+    // Setup working directory and copy assets
+    setupWorkingDirectory(resolvedWorkingDir);
+    copyStaticAssets(docsViewerDir, resolvedWorkingDir);
+
+    console.log(`Using content directory: ${resolvedContentDir}`);
+    console.log(`Using working directory: ${resolvedWorkingDir}`);
 
     try {
       // Create vite server with programmatic config
       const server = await createServer({
         configFile: false,
-        root: websiteDir,
+        root: resolvedWorkingDir,
         plugins: [
           TanStackRouterVite({ autoCodeSplitting: true }),
           viteReact(),
           tailwindcss(),
           json404Middleware(),
+          contentPreprocessPlugin({
+            contentDir: resolvedContentDir,
+            workingDir: resolvedWorkingDir,
+          }),
         ],
         resolve: {
           alias: {
-            "@": path.resolve(websiteDir, "./"),
+            "@": path.resolve(docsViewerDir, "./"),
           },
         },
         optimizeDeps: {
@@ -126,9 +193,10 @@ async function start() {
     } catch (error) {
       console.error(`Failed to start server: ${error}`);
       console.error("\nDebugging information:");
-      console.error(`- Working directory: ${process.cwd()}`);
-      console.error(`- Docs viewer directory: ${websiteDir}`);
-      console.error(`- Content directory: ${process.env.MIRASCOPE_CONTENT_DIR || "not set"}`);
+      console.error(`- Original working directory: ${process.cwd()}`);
+      console.error(`- Docs viewer directory: ${docsViewerDir}`);
+      console.error(`- Content directory: ${resolvedContentDir}`);
+      console.error(`- Working directory: ${resolvedWorkingDir}`);
       process.exit(1);
     }
   }
