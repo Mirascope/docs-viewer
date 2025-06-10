@@ -77,7 +77,7 @@ async function start() {
         "--bun",
         "vite",
         "--config",
-        path.join(websiteDir, "vite.config.ts"),
+        path.join(websiteDir, "vite.config.js"),
         "--port",
         port,
         "--host",
@@ -122,7 +122,7 @@ async function start() {
 
         // Provide helpful debugging information
         console.error("\nDebugging information:");
-        console.error(`- Config file: ${path.join(websiteDir, "vite.config.ts")}`);
+        console.error(`- Config file: ${path.join(websiteDir, "vite.config.js")}`);
         console.error(`- Working directory: ${process.cwd()}`);
         console.error(`- Docs viewer directory: ${websiteDir}`);
         console.error(`- Content directory: ${env.MIRASCOPE_CONTENT_DIR || "not set"}`);
