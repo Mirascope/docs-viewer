@@ -1,6 +1,6 @@
 {
   "name": "@mirascope/docs-viewer",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "private": false,
   "type": "module",
   "bin": {
