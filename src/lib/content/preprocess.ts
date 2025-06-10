@@ -11,7 +11,7 @@ import {
 } from "./content";
 import { DocRegistry } from "./content";
 import { parseAndValidateDocsSpec } from "./json-meta";
-import { parseFrontmatter } from "./mdx-processing";
+import { preprocessMdx } from "./mdx-preprocessing";
 
 /**
  * Path representation for consistent handling across the application
@@ -299,7 +299,10 @@ export class ContentPreprocessor {
   ): Promise<void> {
     // Read and parse file
     const fileContent = fs.readFileSync(filePath, "utf-8");
-    const { frontmatter } = parseFrontmatter(fileContent);
+    const { frontmatter, fullContent } = preprocessMdx(fileContent, {
+      basePath: this.sourceContentDir,
+      filePath,
+    });
 
     // Get the relative path from the source directory
     const relativePath = path.relative(srcDir, filePath);
@@ -325,11 +328,11 @@ export class ContentPreprocessor {
     this.addToMetadataCollection(contentType, metadata);
 
     // Create content object that will be saved to JSON
-    // Just store meta and the raw content (with frontmatter included)
+    // Just store meta and the processed content (with frontmatter and CodeExamples resolved)
     // MDX processing will happen at load time
     const contentObject = {
       meta: metadata,
-      content: fileContent,
+      content: fullContent,
     };
 
     // Create output directory if needed

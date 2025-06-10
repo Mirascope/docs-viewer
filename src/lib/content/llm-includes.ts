@@ -7,7 +7,7 @@
 
 import fs from "fs";
 import path from "path";
-import { parseFrontmatter } from "./mdx-processing";
+import { preprocessMdx } from "./mdx-preprocessing";
 import type { DocInfo } from "./spec";
 import type { DocRegistry } from "./doc-registry";
 import { LLMContent } from "./llm-content";
@@ -36,7 +36,10 @@ function createLLMContentFromDoc(doc: DocInfo, docsRoot?: string): LLMContent {
   }
 
   const rawContent = fs.readFileSync(filePath, "utf-8");
-  const { frontmatter, content } = parseFrontmatter(rawContent);
+  const { frontmatter, content } = preprocessMdx(rawContent, {
+    basePath: path.join(process.cwd(), "content"),
+    filePath,
+  });
 
   // Build final formatted content with ContentSection wrapper
   let wrappedContent = `<Content`;
