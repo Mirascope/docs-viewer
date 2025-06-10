@@ -4,6 +4,7 @@ import { createServer } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { json404Middleware } from "./json-404-middleware.js";
 import http from "http";
 import path from "path";
 
@@ -76,7 +77,12 @@ async function start() {
       const server = await createServer({
         configFile: false,
         root: websiteDir,
-        plugins: [TanStackRouterVite({ autoCodeSplitting: true }), viteReact(), tailwindcss()],
+        plugins: [
+          TanStackRouterVite({ autoCodeSplitting: true }),
+          viteReact(),
+          tailwindcss(),
+          json404Middleware(),
+        ],
         resolve: {
           alias: {
             "@": path.resolve(websiteDir, "./"),
