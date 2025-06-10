@@ -1,6 +1,9 @@
 #!/usr/bin/env bun
 
-import { spawn } from "child_process";
+import { createServer } from "vite";
+import viteReact from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import http from "http";
 import path from "path";
 
@@ -57,77 +60,71 @@ async function start() {
     // Get the website directory (parent of scripts directory)
     const websiteDir = path.dirname(__dirname);
 
-    // Set up environment for vite
-    const env = { ...process.env };
+    // Set up environment variables
     if (contentDir) {
       // Resolve contentDir relative to the original working directory
       const resolvedContentDir = path.resolve(process.cwd(), contentDir);
-      env.MIRASCOPE_CONTENT_DIR = resolvedContentDir;
+      process.env.MIRASCOPE_CONTENT_DIR = resolvedContentDir;
       console.log(`Using content directory: ${resolvedContentDir}`);
     }
 
     // Set the docs viewer directory in environment for vite config
-    env.DOCS_VIEWER_DIR = websiteDir;
+    process.env.DOCS_VIEWER_DIR = websiteDir;
 
-    // Force Vite to use the same host address we checked
-    // Run from current working directory where dependencies are installed
-    const child = spawn(
-      "bun",
-      [
-        "--bun",
-        "vite",
-        "--config",
-        path.join(websiteDir, "vite.config.js"),
-        "--port",
-        port,
-        "--host",
-        host,
-      ],
-      {
-        stdio: ["inherit", "inherit", "pipe"], // Capture stderr for better error handling
-        env,
-        // Don't change cwd - run from where dependencies are available
-      }
-    );
-
-    // Capture stderr to provide better error messages
-    let errorOutput = "";
-    if (child.stderr) {
-      child.stderr.on("data", (data) => {
-        const output = data.toString();
-        errorOutput += output;
-        process.stderr.write(output); // Still show errors in real-time
+    try {
+      // Create vite server with programmatic config
+      const server = await createServer({
+        configFile: false,
+        root: websiteDir,
+        plugins: [TanStackRouterVite({ autoCodeSplitting: true }), viteReact(), tailwindcss()],
+        resolve: {
+          alias: {
+            "@": path.resolve(websiteDir, "./"),
+          },
+        },
+        optimizeDeps: {
+          esbuildOptions: {
+            define: {
+              global: "globalThis",
+            },
+          },
+          exclude: ["content"],
+        },
+        server: {
+          port: parseInt(port),
+          host: host,
+          fs: {
+            strict: false,
+          },
+        },
+        build: {
+          assetsInlineLimit: 4096,
+        },
       });
-    }
 
-    // Improve error handling
-    child.on("error", (error: Error) => {
-      console.error(`Failed to start server: ${error.message}`);
+      await server.listen();
+      console.log(`Server started on http://${host}:${port}`);
+
+      // Handle shutdown gracefully
+      process.on("SIGTERM", async () => {
+        console.log("Shutting down server...");
+        await server.close();
+        process.exit(0);
+      });
+
+      process.on("SIGINT", async () => {
+        console.log("Shutting down server...");
+        await server.close();
+        process.exit(0);
+      });
+    } catch (error) {
+      console.error(`Failed to start server: ${error}`);
+      console.error("\nDebugging information:");
+      console.error(`- Working directory: ${process.cwd()}`);
+      console.error(`- Docs viewer directory: ${websiteDir}`);
+      console.error(`- Content directory: ${process.env.MIRASCOPE_CONTENT_DIR || "not set"}`);
       process.exit(1);
-    });
-
-    child.on("exit", (code: number | null, signal: NodeJS.Signals | null) => {
-      if (code !== 0) {
-        console.error(`Server exited with code ${code}`);
-        if (signal) {
-          console.error(`Server killed with signal ${signal}`);
-        }
-
-        // Show captured error output for debugging
-        if (errorOutput.trim()) {
-          console.error("\n--- Detailed Error Output ---");
-          console.error(errorOutput.trim());
-          console.error("--- End Error Output ---\n");
-        }
-
-        // Provide helpful debugging information
-        console.error("\nDebugging information:");
-        console.error(`- Config file: ${path.join(websiteDir, "vite.config.js")}`);
-        console.error(`- Working directory: ${process.cwd()}`);
-        console.error(`- Docs viewer directory: ${websiteDir}`);
-        console.error(`- Content directory: ${env.MIRASCOPE_CONTENT_DIR || "not set"}`);
-      }
-    });
+    }
   }
 }
 
