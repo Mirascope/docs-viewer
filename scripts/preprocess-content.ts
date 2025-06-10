@@ -4,27 +4,8 @@ import { ContentPreprocessor } from "@/src/lib/content/preprocess";
 import { DocRegistry } from "@/src/lib/content";
 import { parseAndValidateDocsSpec } from "@/src/lib/content/json-meta";
 import { LLMContent } from "@/src/lib/content/llm-content";
-import { include } from "@/src/lib/content/llm-includes";
 import { SITE_URL, getAllRoutes } from "@/src/lib/router-utils";
 import type { BlogMeta } from "@/src/lib/content";
-import { MIRASCOPE } from "@/src/lib/constants/site";
-
-/**
- * Generate LLM content dynamically from the doc registry
- */
-function generateLLMContent(registry: DocRegistry, contentDir: string): LLMContent[] {
-  const mirascopeChildren = include.flatTree("", registry, path.join(contentDir, "docs"));
-
-  const mirascopeContent = LLMContent.fromChildren({
-    slug: "mirascope",
-    title: "Mirascope",
-    description: MIRASCOPE.tagline,
-    route: "/docs/llms-full",
-    children: mirascopeChildren,
-  });
-
-  return [mirascopeContent];
-}
 
 /**
  * Main processing function that generates static JSON files for all MDX content,
@@ -47,40 +28,15 @@ export async function preprocessContent(
     const preprocessor = new ContentPreprocessor(baseDir, registry, contentDir, verbose);
     await preprocessor.processAllContent();
 
-    if (verbose) console.log("Processing LLM documents...");
-    const llmMeta = generateLLMContent(registry, contentDir);
-    await writeLLMDocuments(llmMeta, verbose);
-
-    await generateSitemap(preprocessor.getMetadataByType().blog, llmMeta, contentDir);
+    await generateSitemap(
+      preprocessor.getMetadataByType().blog,
+      preprocessor.getLLMContent(),
+      contentDir
+    );
     return;
   } catch (error) {
     console.error("Error during preprocessing:", error);
     throw error; // Let the caller handle the error
-  }
-}
-
-/**
- * Write LLM documents to disk as JSON and TXT files
- */
-async function writeLLMDocuments(llmDocs: LLMContent[], verbose = true): Promise<void> {
-  const publicDir = path.join(process.cwd(), "public");
-
-  for (const doc of llmDocs) {
-    const routePath = doc.route!;
-
-    // Write JSON file for viewer consumption at public/static/content/{routePath}.json
-    const jsonPath = path.join(publicDir, "static", "content", `${routePath}.json`);
-    fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
-    fs.writeFileSync(jsonPath, JSON.stringify(doc.toJSON(), null, 2));
-
-    // Write TXT file for direct LLM consumption at public/{routePath}.txt
-    const txtPath = path.join(publicDir, `${routePath}.txt`);
-    fs.mkdirSync(path.dirname(txtPath), { recursive: true });
-    fs.writeFileSync(txtPath, doc.getContent());
-
-    if (verbose) {
-      console.log(`Generated LLM document: ${routePath} (${doc.tokenCount} tokens)`);
-    }
   }
 }
 

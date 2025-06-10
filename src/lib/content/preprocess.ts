@@ -12,6 +12,9 @@ import {
 import { DocRegistry } from "./content";
 import { parseAndValidateDocsSpec } from "./json-meta";
 import { preprocessMdx } from "./mdx-preprocessing";
+import { LLMContent } from "./llm-content";
+import { include } from "./llm-includes";
+import { MIRASCOPE } from "@/src/lib/constants/site";
 
 /**
  * Path representation for consistent handling across the application
@@ -50,6 +53,9 @@ export class ContentPreprocessor {
 
   // Track errors for reporting
   private errors: string[] = [];
+
+  // Track LLM content for generation
+  private llmContent: LLMContent[] = [];
 
   // Validation pattern for filenames/slugs
   private static readonly VALID_SLUG_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
@@ -129,6 +135,9 @@ export class ContentPreprocessor {
 
     // Write metadata index files
     this.writeMetadataFiles();
+
+    // Generate LLM content using the registry and sourceContentDir
+    this.generateLLMContent();
 
     // Generate the unified metadata file
     this.writeUnifiedMetaFile();
@@ -543,6 +552,57 @@ export class ContentPreprocessor {
   }
 
   /**
+   * Generate LLM content from the doc registry
+   */
+  private generateLLMContent(): void {
+    if (this.verbose) console.log("Processing LLM documents...");
+
+    const mirascopeChildren = include.flatTree(
+      "",
+      this.registry,
+      path.join(this.sourceContentDir, "docs")
+    );
+
+    const mirascopeContent = LLMContent.fromChildren({
+      slug: "mirascope",
+      title: "Mirascope",
+      description: MIRASCOPE.tagline,
+      route: "/docs/llms-full",
+      children: mirascopeChildren,
+    });
+
+    this.llmContent = [mirascopeContent];
+
+    // Write LLM documents to disk
+    this.writeLLMDocuments();
+  }
+
+  /**
+   * Write LLM documents to disk as JSON and TXT files
+   */
+  private writeLLMDocuments(): void {
+    const publicDir = path.join(this.baseDir, "public");
+
+    for (const doc of this.llmContent) {
+      const routePath = doc.route!;
+
+      // Write JSON file for viewer consumption at public/static/content/{routePath}.json
+      const jsonPath = path.join(publicDir, "static", "content", `${routePath}.json`);
+      fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+      fs.writeFileSync(jsonPath, JSON.stringify(doc.toJSON(), null, 2));
+
+      // Write TXT file for direct LLM consumption at public/{routePath}.txt
+      const txtPath = path.join(publicDir, `${routePath}.txt`);
+      fs.mkdirSync(path.dirname(txtPath), { recursive: true });
+      fs.writeFileSync(txtPath, doc.getContent());
+
+      if (this.verbose) {
+        console.log(`Generated LLM document: ${routePath} (${doc.tokenCount} tokens)`);
+      }
+    }
+  }
+
+  /**
    * Write a unified metadata file that combines metadata from all content types
    * This is useful for search functionality, where we need to lookup metadata by URL route
    */
@@ -583,6 +643,13 @@ export class ContentPreprocessor {
       policy: this.policyMetadata,
       dev: this.devMetadata,
     };
+  }
+
+  /**
+   * Return the generated LLM content
+   */
+  getLLMContent(): LLMContent[] {
+    return this.llmContent;
   }
 }
 

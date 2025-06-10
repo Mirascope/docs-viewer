@@ -36,8 +36,13 @@ function createLLMContentFromDoc(doc: DocInfo, docsRoot?: string): LLMContent {
   }
 
   const rawContent = fs.readFileSync(filePath, "utf-8");
+
+  // Use the docsRoot's parent directory (which should be the content directory)
+  // If docsRoot is "/path/to/content/docs", we want "/path/to/content"
+  const contentDir = docsRoot ? path.dirname(docsRoot) : path.join(process.cwd(), "content");
+
   const { frontmatter, content } = preprocessMdx(rawContent, {
-    basePath: path.join(process.cwd(), "content"),
+    basePath: contentDir,
     filePath,
   });
 
