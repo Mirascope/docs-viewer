@@ -160,7 +160,7 @@ async function start() {
           TanStackRouterVite({ autoCodeSplitting: true }),
           viteReact(),
           tailwindcss(),
-          json404Middleware(),
+          json404Middleware(path.join(resolvedWorkingDir, "public")),
           contentPreprocessPlugin({
             contentDir: resolvedContentDir,
             workingDir: resolvedWorkingDir,

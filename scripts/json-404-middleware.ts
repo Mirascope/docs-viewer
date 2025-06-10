@@ -12,14 +12,15 @@ import type { Connect } from "vite";
 /**
  * Create a Vite plugin that adds middleware to handle 404s for JSON requests
  */
-export function json404Middleware() {
+export function json404Middleware(publicDir: string) {
   return {
     name: "vite-plugin-json-404",
     configureServer(server: {
       middlewares: { use: (middleware: Connect.NextHandleFunction) => void };
     }) {
       console.log("🔍 JSON 404 middleware enabled");
-      server.middlewares.use(createJson404Middleware());
+      console.log(`📂 Using public directory: ${publicDir}`);
+      server.middlewares.use(createJson404Middleware(publicDir));
     },
   };
 }
@@ -27,7 +28,7 @@ export function json404Middleware() {
 /**
  * Create middleware that intercepts JSON requests and returns 404 for non-existent files
  */
-function createJson404Middleware(): Connect.NextHandleFunction {
+function createJson404Middleware(publicDir: string): Connect.NextHandleFunction {
   return async (req, res, next) => {
     // Only handle JSON requests
     if (!req.url || !req.url.endsWith(".json")) {
@@ -36,11 +37,12 @@ function createJson404Middleware(): Connect.NextHandleFunction {
 
     // Clean up URL and get file path
     const urlPath = req.url.startsWith("/") ? req.url.slice(1) : req.url;
-    const filePath = path.resolve(process.cwd(), "public", urlPath);
+    const filePath = path.resolve(publicDir, urlPath);
 
     // Check if the file exists
     if (!fs.existsSync(filePath)) {
       // File doesn't exist, return 404
+      console.log(`❌ 404: Json file not found at ${filePath}`);
       res.statusCode = 404;
       res.setHeader("Content-Type", "application/json");
       res.end(
