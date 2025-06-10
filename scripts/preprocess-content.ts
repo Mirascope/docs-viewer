@@ -155,93 +155,54 @@ async function generateSitemap(
   fs.writeFileSync(outFile, xml);
 }
 
-// Vite server interface for TypeScript
-interface ViteDevServer {
-  httpServer?: {
-    once(event: string, callback: () => void): void;
-  };
-  watcher: {
-    add(path: string): void;
-    on(event: string, callback: (path: string) => void): void;
-  };
-}
+// Import proper Vite types
+import type { ViteDevServer } from "vite";
 
 export function contentPreprocessPlugin(
   options: { verbose?: boolean; contentDir?: string } = { verbose: true, contentDir: undefined }
 ) {
-  const { contentDir } = options;
+  const { verbose = true, contentDir } = options;
   const baseContentDir = contentDir || path.join(process.cwd(), "content");
-
-  // Get all content directories (docs includes LLM document templates)
-  const contentDirs = ["docs"].map((type) => path.join(baseContentDir, type));
 
   return {
     name: "content-preprocess-plugin",
-    // Only apply during development
     apply: "serve" as const,
-    configureServer(server: ViteDevServer) {
-      const { verbose } = options;
 
-      // Run preprocessing when the server starts
-      server.httpServer?.once("listening", async () => {
-        if (verbose) console.log("Initial content preprocessing for development...");
-        await preprocessContent({ verbose, contentDir: baseContentDir }).catch((error) => {
-          console.error("Error preprocessing content:", error);
-        });
+    // Run initial preprocessing when plugin loads
+    buildStart() {
+      preprocessContent({ verbose, contentDir: baseContentDir }).catch((error) => {
+        console.error("Error preprocessing content:", error);
       });
+    },
 
-      // Create the base content directory if it doesn't exist
-      if (!fs.existsSync(baseContentDir)) {
-        fs.mkdirSync(baseContentDir, { recursive: true });
-      }
-
-      // Always watch the base content directory
+    configureServer(server: ViteDevServer) {
+      // Watch content directory for changes
       server.watcher.add(baseContentDir);
 
-      // Set up watching on content directories
-      contentDirs.forEach((dir) => {
-        // Create the directory if it doesn't exist
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
-
-        if (verbose) console.log(`Watching directory for changes: ${dir}`);
-        server.watcher.add(dir);
-      });
-
-      // React to content changes - these will work for any content directory
-      server.watcher.on("change", async (filePath: string) => {
-        if (
-          (filePath.endsWith(".mdx") || filePath.endsWith(".ts")) &&
-          filePath.includes("/content/")
-        ) {
-          if (verbose) console.log(`Content file changed: ${filePath}`);
-          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
-            console.error("Error preprocessing content after file change:", error);
+      // Re-run preprocessing when content files change
+      server.watcher.on("change", (filePath: string) => {
+        if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
+          console.log(`Content file changed: ${path.relative(process.cwd(), filePath)}`);
+          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+            console.error("Error preprocessing content after change:", error);
           });
         }
       });
 
-      server.watcher.on("add", async (filePath: string) => {
-        if (
-          (filePath.endsWith(".mdx") || filePath.endsWith(".ts")) &&
-          filePath.includes("/content/")
-        ) {
-          if (verbose) console.log(`Content file added: ${filePath}`);
-          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
-            console.error("Error preprocessing content after file add:", error);
+      server.watcher.on("add", (filePath: string) => {
+        if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
+          console.log(`Content file added: ${path.relative(process.cwd(), filePath)}`);
+          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+            console.error("Error preprocessing content after add:", error);
           });
         }
       });
 
-      server.watcher.on("unlink", async (filePath: string) => {
-        if (
-          (filePath.endsWith(".mdx") || filePath.endsWith(".ts")) &&
-          filePath.includes("/content/")
-        ) {
-          if (verbose) console.log(`Content file deleted: ${filePath}`);
-          await preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
-            console.error("Error preprocessing content after file delete:", error);
+      server.watcher.on("unlink", (filePath: string) => {
+        if (filePath.endsWith(".mdx") && filePath.includes("/content/")) {
+          console.log(`Content file deleted: ${path.relative(process.cwd(), filePath)}`);
+          preprocessContent({ verbose: false, contentDir: baseContentDir }).catch((error) => {
+            console.error("Error preprocessing content after delete:", error);
           });
         }
       });
