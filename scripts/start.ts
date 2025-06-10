@@ -67,6 +67,22 @@ function setupWorkingDirectory(workingDir: string): void {
 function copyStaticAssets(docsViewerDir: string, workingDir: string): void {
   const resolvedWorkingDir = path.resolve(workingDir);
 
+  // Copy src directory
+  const srcSrc = path.join(docsViewerDir, "src");
+  const srcDest = path.join(resolvedWorkingDir, "src");
+  if (fs.existsSync(srcSrc)) {
+    fs.cpSync(srcSrc, srcDest, { recursive: true });
+    console.log(`Copied src directory: ${srcSrc} -> ${srcDest}`);
+  }
+
+  // Copy mirascope-ui directory
+  const uiSrc = path.join(docsViewerDir, "mirascope-ui");
+  const uiDest = path.join(resolvedWorkingDir, "mirascope-ui");
+  if (fs.existsSync(uiSrc)) {
+    fs.cpSync(uiSrc, uiDest, { recursive: true });
+    console.log(`Copied mirascope-ui directory: ${uiSrc} -> ${uiDest}`);
+  }
+
   // Copy public directory if it exists
   const publicSrc = path.join(docsViewerDir, "public");
   const publicDest = path.join(resolvedWorkingDir, "public");
