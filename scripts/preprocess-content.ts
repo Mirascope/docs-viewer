@@ -33,7 +33,8 @@ export async function preprocessContent(
     await generateSitemap(
       preprocessor.getMetadataByType().blog,
       preprocessor.getLLMContent(),
-      contentDir
+      contentDir,
+      workingDir
     );
     return;
   } catch (error) {
@@ -48,7 +49,8 @@ export async function preprocessContent(
 async function generateSitemap(
   blogPosts: BlogMeta[],
   llmDocs: LLMContent[],
-  contentDir?: string
+  contentDir: string,
+  workingDir: string
 ): Promise<void> {
   console.log("Generating sitemap.xml...");
 
@@ -109,7 +111,7 @@ async function generateSitemap(
   xml += "</urlset>";
 
   // Write to file
-  const outFile = path.join(process.cwd(), "public", "sitemap.xml");
+  const outFile = path.join(workingDir, "public", "sitemap.xml");
   fs.writeFileSync(outFile, xml);
 }
 
